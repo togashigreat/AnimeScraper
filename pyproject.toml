@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "AnimeScraper"
+version = "1.0.0"
+description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
+authors = ["MuQiT"]
+readme = "README.md"
+license = "MIT"
+keywords = ["anime", "scraper", "myanimelist", "fetcher", "manga"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+aiohttp = "^3.11.6"
+beautifulsoup4 = "^4.12.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.24.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
