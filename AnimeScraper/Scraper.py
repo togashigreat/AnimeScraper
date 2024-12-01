@@ -1,8 +1,8 @@
 from typing import Optional
 import aiohttp
 
-from AnimeScraper._parse_anime_data import _parse_anime_data, get_character
-from AnimeScraper._model import (
+from _parse_anime_data import _parse_anime_data, get_character
+from _model import (
     Anime,
     AnimeCharacter,
     AnimeStats,
@@ -90,8 +90,17 @@ class MalScraper:
         )
 
 class KunYu:
-    # This is the main class 
+    """
+    This is the main class. It handles interaction with Myanimelist.
+
+    Methods:
+    - get_anime: Fetches anime details based on its ID 
+
+    - get_character: Fetches character details based on its ID
+
+    """
     def __init__(self) -> None:
+        """Initialize the KunYu scraper."""
         self.shared_session: Optional[aiohttp.ClientSession] = None
     
 
@@ -110,13 +119,13 @@ class KunYu:
 
     async def get_anime(self, anime_id: int)->Anime:
         """
-        Fatch anime details from MAL or cache (if caching enabled)
+        Fatches an anime details from MAL website by its ID 
 
         Args:
-            anime_id: The MAL id of the anime
-            use_cache: Whether to use cached data if available
+            - anime_id (int): The MAL id of the anime
+
         Retuns:
-            Anime object with details
+            - Anime (object):  An Anime object with the anime details
         """
 
         async with MalScraper(session=self.shared_session) as scraper:
@@ -125,7 +134,13 @@ class KunYu:
 
     async def get_character(self, character_id: int)-> Character:
         """
+        Fatches a Character details from MAL website by its ID
 
+        Args:
+            - character_id (int): The MAL id of the Character
+
+        Retuns:
+            - Character (object): An Character obeject with character details
         """
         async with MalScraper(session=self.shared_session) as scraper:
             character = await scraper.get_character(character_id)

@@ -4,17 +4,25 @@ version = "1.0.0"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["MuQiT"]
 readme = "README.md"
+repository = "https://github.com/togashigreat/AnimeScraper"
+homepage = "https://github.com/togashigreat/AnimeScraper"
 license = "MIT"
 keywords = ["anime", "scraper", "myanimelist", "fetcher", "manga"]
+packages = [
+    { include = "AnimeScraper" }
+]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 aiohttp = "^3.11.6"
 beautifulsoup4 = "^4.12.1"
+sphinx = "^8.1.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 pytest-asyncio = "^0.24.0"
+sphinx = "^8.1.3"
+sphinx-rtd-theme = "^3.0.2"
 
 [build-system]
 requires = ["poetry-core"]
