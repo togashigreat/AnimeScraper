@@ -1,8 +1,4 @@
-"""
-AnimeScraper: A Python library for scraping and parsing anime data from MyAnimeList.
-"""
-
-from Scraper import KunYu
+from .Scraper import KunYu
 
 __all__ = ["KunYu"]
 

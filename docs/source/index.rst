@@ -8,11 +8,29 @@ Welcome to AnimeScraper's documentation!
 
 This project is a Python library for scraping and parsing anime data from MyAnimeList.
 
+
+.. admonition:: warning
+   :class: warning
+
+   This library needs python 3.10 +
+
+
 Features
 --------
 - Fetch anime details (title, synopsis, etc.)
-- Get character information
+- Get character information (name, age, etc.)
 - Supports asynchronous fetching
+- Fast 🚀
+
+Contents
+--------
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   Scraper
+   _model
+   usage
 
 Installation
 ------------
@@ -20,12 +38,9 @@ To install the library, use:
 
 .. code-block:: bash
 
-   pip install AnimeScraper
+   # Linux/MacOS
+   python3 -m pip install -U AnimeScraper
 
-API Documentation
------------------
-.. automodule:: AnimeScraper
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   # Windows
+   py -3 -m pip install -U AnimeScraper
 
