@@ -1,6 +1,8 @@
 # AnimeScraper
 
-AnimeScraper is a Python library for effortlessly scraping anime and character data from MyAnimeList.
+![AnimeScraper Logo](./docs/assets/icon.svg)
+
+**AnimeScraper** is a Python library designed for scraping and parsing anime-related data from MyAnimeList. With support for asynchronous requests, it allows you to fetch detailed information about anime, characters, and more efficiently.
 
 ## 🚀 Features
 
@@ -51,6 +53,9 @@ async def get_character():
 
 asyncio.run(get_character())
 ```
+## 📖 Documentation
+
+Detailed documentation is available. [Check out the Documentation](https://anime-scraper.readthedocs.io)
 
 ## 🌟 Key Components
 
@@ -85,6 +90,6 @@ AnimeScraper/
 Distributed under the MIT License. See LICENSE for more information.
 
 ## 📞 Contact
-Contact me - <a href="https://www.facebook.com/KiyotakaO.O?mibextid=ZbWKwL"><img src="https://skillicons.dev/icons?i=instagram" /></a> <br/>
 
-Project Link: <a href="https://github.com/togashigreat/AnimeScraper"><img src="./docs/assets/icon.svg" height="256" width="256" /></a>
+[Facebook](https://facebook.com/KiyotakaO.O)
+[Telegram](t.me/togayuuta)
