@@ -27,7 +27,6 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
 ]
-
 # Napoleon settings
 napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
@@ -40,14 +39,16 @@ autodoc_default_options = {
     'undoc-members': True,
     'show-inheritance': True,
     'private-members': False,
-    'special-members': '__init__',
+    'special-members':  '__init__',
 }
+
 
 autodoc_member_order = "bysource"
 
 autodoc_exclude_members = ['__init__']
 
 templates_path = ['_templates']
+
 exclude_patterns = [
     '_parse_anime_data.py',
     'tests/*',
