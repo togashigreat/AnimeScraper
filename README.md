@@ -85,6 +85,6 @@ AnimeScraper/
 Distributed under the MIT License. See LICENSE for more information.
 
 ## 📞 Contact
-Facebook - <a href="https://www.facebook.com/KiyotakaO.O?mibextid=ZbWKwL"><img src="https://skillicons.dev/icons?i=facebook" /></a> <br/>
+Contact me - <a href="https://www.facebook.com/KiyotakaO.O?mibextid=ZbWKwL"><img src="https://skillicons.dev/icons?i=instagram" /></a> <br/>
 
 Project Link: <a href="https://github.com/togashigreat/AnimeScraper"><img src="./docs/assets/icon.svg" height="256" width="256" /></a>
