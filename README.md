@@ -55,7 +55,7 @@ asyncio.run(get_character())
 ```
 ## 📖 Documentation
 
-Detailed documentation is available. [Check out the Documentation](https://anime-scraper.readthedocs.io)
+Detailed documentation is available. [Check out the Documentation](https://animescraper.readthedocs.io/en/latest/)
 
 ## 🌟 Key Components
 
