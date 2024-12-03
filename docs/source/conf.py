@@ -32,14 +32,13 @@ napoleon_google_docstring = True
 napoleon_include_init_with_doc = True
 napoleon_use_param = True
 napoleon_use_rtype = True
-
 # Autodoc default options
 autodoc_default_options = {
     'members': True,
     'undoc-members': True,
     'show-inheritance': True,
     'private-members': False,
-    'special-members':  '__init__',
+    'special-members':  False,
 }
 
 
