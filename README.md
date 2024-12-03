@@ -87,4 +87,4 @@ Distributed under the MIT License. See LICENSE for more information.
 ## 📞 Contact
 Facebook - <a href="https://www.facebook.com/KiyotakaO.O?mibextid=ZbWKwL"><img src="https://skillicons.dev/icons?i=facebook" /></a> <br/>
 
-Project Link: <a href="https://github.com/togashigreat/AnimeScraper"><img src="./docs/assets/icon.svg" /></a>
+Project Link: <a href="https://github.com/togashigreat/AnimeScraper"><img src="./docs/assets/icon.svg" height="256" width="256" /></a>
