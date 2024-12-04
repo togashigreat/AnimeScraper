@@ -1,16 +1,26 @@
 [tool.poetry]
 name = "AnimeScraper"
-version = "1.0.2"
+version = "1.0.3"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["MuQiT"]
 readme = "README.md"
 repository = "https://github.com/togashigreat/AnimeScraper"
 homepage = "https://github.com/togashigreat/AnimeScraper"
-license = "MIT"
-keywords = ["anime", "scraper", "myanimelist", "fetcher", "manga"]
+license = "GPL v3.0"
+keywords = ["anime", "scraper", "myanimelist", "fetcher", "manga", "anime library"]
 packages = [
     { include = "AnimeScraper" }
 ]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content"
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.10"
