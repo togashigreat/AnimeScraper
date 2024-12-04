@@ -22,6 +22,26 @@ pip install animescraper
 
 ## 📖 Quick Start
 
+Searching Anime 
+
+```python
+import asyncio
+from AnimeScraper import KunYu
+
+async def main():
+
+    scraper = KunYu()
+    # Fetch anime detials by name
+    anime = await scraper.search_anime("violet evergarden")  # Violet Evergarden
+    print(anime.title)
+    print(anime.synopsis)
+    print(anime.stats.score)
+    print(anime.characters[0].name)
+
+asyncio.run(main())
+```
+
+
 Fetching Anime details
 
 ```python
@@ -32,7 +52,7 @@ async def main():
     # Use async Context manager to fetch multiple anime with same session
     async with KunYu() as scraper:
         # Fetch anime details by ID
-        anime = await scraper.get_anime(32281)  # Fullmetal Alchemist: Brotherhood
+        anime = await scraper.get_anime("32281")  # Fullmetal Alchemist: Brotherhood
         print(anime.title)
         print(anime.synopsis)
         print(anime.stats.score)
@@ -47,7 +67,7 @@ Fetching Character Details
 async def get_character():
     scraper = KunYu()
         # Fetch character details by ID
-    character = await scraper.get_character(11)  # Edward Elric
+    character = await scraper.get_character("11")  # Edward Elric
     print(character.name)
     print(character.japanese_name)
 
