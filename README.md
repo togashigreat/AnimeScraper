@@ -22,7 +22,7 @@ pip install animescraper
 
 ## 📖 Quick Start
 
-Searching Anime 
+**Searching Anime** 
 
 ```python
 import asyncio
@@ -42,7 +42,7 @@ asyncio.run(main())
 ```
 
 
-Fetching Anime details
+**Fetching Anime details**
 
 ```python
 import asyncio
@@ -61,7 +61,7 @@ async def main():
 asyncio.run(main())
 
 ```
-Fetching Character Details
+**Fetching Character Details**
 
 ```python
 async def get_character():
