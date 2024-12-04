@@ -6,7 +6,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/AnimeScraper)
 
 
-**AnimeScraper** is a Python library designed for scraping and parsing anime-related data from MyAnimeList. With support for asynchronous requests, it allows you to fetch detailed information about anime, characters, and more efficiently.
+**AnimeScraper** is an Open Source Python library designed for scraping and parsing anime-related data from MyAnimeList. With support for asynchronous requests, it allows you to fetch detailed information about anime, characters, and more efficiently.
 
 ## 🚀 Features
 
