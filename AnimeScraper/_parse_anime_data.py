@@ -148,3 +148,13 @@ def get_span_text(soup: BeautifulSoup, info_name: str)->str:
     else:
         return "N/A"
 
+
+def parse_anime_search(html):
+    soup = BeautifulSoup(html, "html.parser")
+    tag = soup.find("a", "hoverinfo_trigger fw-b fl-l")
+    
+    name = tag.text #type: ignore
+    url = tag.get("href") #type: ignore
+
+    return (name, url)
+

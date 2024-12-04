@@ -1,0 +1,4 @@
+aiohttp
+Sphinx
+Sphinx-rtd-theme
+furo

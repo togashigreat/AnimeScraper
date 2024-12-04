@@ -1,4 +1,3 @@
 aiohttp
-Sphinx
-Sphinx-rtd-theme
-furo
+beautifulsoup4
+rapidfuzz
