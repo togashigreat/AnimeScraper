@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AnimeScraper"
-version = "1.0.4"
+version = "1.0.5"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["MuQiT"]
 readme = "README.md"
