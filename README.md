@@ -57,12 +57,12 @@ async def main():
 
     scraper = KunYu()
     # Search and Fetch Character detials by name
-    anime = await scraper.search_character("Killua Zoldyck")
+    character = await scraper.search_character("Killua Zoldyck")
 
-    print(anime.title)
-    print(anime.synopsis)
-    print(anime.stats.score)
-    print(anime.characters[0].name)
+    print(character.name)
+    print(character.url)
+    print(character.description)
+    print(character.about)
 
 asyncio.run(main())
 ```
