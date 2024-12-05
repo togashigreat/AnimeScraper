@@ -25,7 +25,7 @@ class AnimeCharacter:
 @dataclass 
 class Character:
     """
-    Represents a character in an anime with full details.
+    Represents a character with full details.
 
     Attributes:
         id (str): The character's ID.

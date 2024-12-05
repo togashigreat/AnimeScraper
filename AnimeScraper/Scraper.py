@@ -51,7 +51,7 @@ class KunYu:
         async with MalScraper(session=self.shared_session) as scraper:
             anime = await scraper.search_anime(anime_name)
             return anime
-    async def search_character(self, character_name)-> Character:
+    async def search_character(self, character_name: str)-> Character:
         """
         Fetches and Returns Character details from myanimelist.
 
