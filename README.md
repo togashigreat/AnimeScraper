@@ -26,6 +26,7 @@ pip install animescraper
 
 ## 📖 Quick Start
 
+
 **Searching Anime** 
 
 ```python
@@ -37,6 +38,27 @@ async def main():
     scraper = KunYu()
     # Fetch anime detials by name
     anime = await scraper.search_anime("violet evergarden")  # Violet Evergarden
+    print(anime.title)
+    print(anime.synopsis)
+    print(anime.stats.score)
+    print(anime.characters[0].name)
+
+asyncio.run(main())
+```
+
+
+**Searching Character** 
+
+```python
+import asyncio
+from AnimeScraper import KunYu
+
+async def main():
+
+    scraper = KunYu()
+    # Search and Fetch Character detials by name
+    anime = await scraper.search_character("Killua Zoldyck")
+
     print(anime.title)
     print(anime.synopsis)
     print(anime.stats.score)

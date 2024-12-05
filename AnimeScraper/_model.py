@@ -31,12 +31,20 @@ class Character:
         id (str): The character's ID.
         name (str): The character's name.
         japanese_name (str): The character's Japanese name.
-        information (Dict): A dictionary containing The character's Age, Height, Weight etc.
+        about (Dict): A dictionary containing The character's Age, Height, Weight etc.
+        description (str): The character's description from MAL.
+        img (str): Character image.
+        favorites (str): The number people marked it as favorite
+        url (str): The MAL Page url of the Character.
     """
     id: str
     name: str
     japanese_name: Optional[str]
-    information: Dict
+    about: Dict
+    description: str
+    img: str
+    favorites: str
+    url: str
 
 
 @dataclass
@@ -78,7 +86,7 @@ class Anime:
         rating (str): The age rating (e.g., PG-13).
         synopsis (str): A brief synopsis of the anime.
         genres (List[str]): List of genres.
-        studios (List[str]): List of studios.
+        studios (str): List of studios.
         themes (List[str]): List of themes.
         stats (AnimeStats): Statistics about the anime.
         characters (List[AnimeCharacter]): List of characters in the anime.
@@ -97,7 +105,7 @@ class Anime:
     rating: str # PG-13, R, etc.
     synopsis: str
     genres: List[str] | None
-    studios: List
+    studios: str
     themes: List | None
     stats: AnimeStats
     characters: List[AnimeCharacter]

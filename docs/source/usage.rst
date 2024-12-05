@@ -1,6 +1,7 @@
 Usage Guide
 ===========
 
+
 Basic Usage
 -----------
 Here’s how you can use the AnimeScraper library:
@@ -8,9 +9,9 @@ Here’s how you can use the AnimeScraper library:
 
 
 
-Fetching Anime Details
-~~~~~~~~~~~~~~~~~~~~~~
-To fetch details of an anime:
+Searching Anime
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+To Search and fetch details of an anime:
 
 .. code-block:: python
    
@@ -28,13 +29,37 @@ To fetch details of an anime:
 
 
 
+Searching Character
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+To Search and fetch details of a Character:
+
+.. code-block:: python
+   
+  # example 1
+  import asyncio 
+  from AnimeScraper import KunYu
+  
+  async def main():
+      scraper = KunYu()
+      character = await scraper.search_character("Togashi Yuuta")  # Searching for the Character Togashi Yuuta
+      print(character)
+      print(character.japanese_name)
+      print(character.about)
+      print(character.description)
+   
+  asyncio.run(main())
+
+
+.. Note:: To get the exact chataracter you want use the correct name of the character. Otherwise, It may show you a different character's result.
+
+
 Fetching Anime Details
 ~~~~~~~~~~~~~~~~~~~~~~
 To fetch details of an anime:
 
 .. code-block:: python
    
-  # example 1
+  # example 2
   import asyncio 
   from AnimeScraper import KunYu
   
@@ -52,7 +77,7 @@ To fetch details of a character:
 
 .. code-block:: python
 
-   #example 2
+   #example 3
    import asyncio
    from AnimeScraper import KunYu
 
@@ -60,9 +85,10 @@ To fetch details of a character:
       scraper = KunYu()
       character = await scraper.get_character("1")  # Replace `1` with a valid character ID
       print(character.name)
+      print(character.img)
 
    asyncio.run(main())
 
 
-.. Note:: You can use ``KunYu()`` class with async conext manager like **example 1** or you can normally define ``KunYu()`` to a variable as we did in **example 2** and in **example 0** whatever you lke. 
+.. Note:: You can use ``KunYu()`` class with async conext manager like **example 2** or you can normally define ``KunYu()`` to a variable as we did in **example 3** and in **example 0** whatever you lke. 
 

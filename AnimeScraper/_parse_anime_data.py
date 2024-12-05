@@ -1,7 +1,8 @@
+import re
 from bs4 import BeautifulSoup
-from typing import Dict, List, Any 
-
-async def _parse_anime_data(html: str)-> Dict[str, Any]:
+from typing import Dict, List
+from ._model import Anime, AnimeCharacter, AnimeStats, Character
+async def _parse_anime_data(html: str)-> Anime:
 
     soup = BeautifulSoup(html, "html.parser")
     anime_id = soup.find("input", attrs={"name": "aid"}).attrs["value"] # type: ignore
@@ -31,61 +32,61 @@ async def _parse_anime_data(html: str)-> Dict[str, Any]:
 
     anime_stats = await get_anime_stats(soup)
     anime_characters = await _anime_characters(soup)
-    
-    return {
-        "id" : anime_id,
-        "title" : title,
-        "english_title": eng_title,
-        "japanese_title" : jap_title,
-        "anime_type": anime_type,
-        "episodes": episodes,
-        "status" : status,
-        "aired" : aired,
-        "duration": duration,
-        "premiered" : premiered,
-        "rating" : rating,
-        "synopsis" : synopsis,
-        "genres" : genres_list,
-        "studios" : studios,
-        "themes": theme_list,
-        "stats": anime_stats,
-        "characters": anime_characters
-    }
-    
+
+    return Anime(
+        anime_id,
+        title,
+        eng_title,
+        jap_title,
+        anime_type,
+        episodes,
+        status,
+        aired,
+        duration,
+        premiered,
+        rating,
+        synopsis,
+        genres_list,
+        studios,
+        theme_list,
+        anime_stats,
+        anime_characters
+    )
 
 
-async def get_anime_stats(soup: BeautifulSoup)-> List[str]:
+
+async def get_anime_stats(soup: BeautifulSoup)-> AnimeStats:
     score = soup.find("span", attrs={"itemprop": "ratingValue"}).text #type: ignore
     scored_by = soup.find("span", attrs={"itemprop": "ratingCount"}).text #type: ignore
     popularity = get_span_text(soup, "Popularity")
     members = get_span_text(soup, "Members")
     favorites = get_span_text(soup, "Favorites")
     ranked = soup.find("span", "numbers ranked").strong.text # type: ignore
-    return [
-        score,
-        scored_by, # scored by nunbers of people
-        ranked,
-        popularity,
-        members,
-        favorites,
-    ]
+    return AnimeStats(
+        score, 
+        scored_by, 
+        ranked, 
+        popularity, 
+        members, 
+        favorites
+    )
 
 
-async def _anime_characters(soup)-> List[List]:
+async def _anime_characters(soup)-> List[AnimeCharacter]:
 
     tables = soup.find("div", "detail-characters-list clearfix").find_all("table", attrs={"width":"100%"}) #type: ignore    
     characters = []
 
     for table in tables:
         character = table.find("h3", "h3_characters_voice_actors")
-        td_tag = table.find("td", "va-t ar pl4 pr4")
         characters.append([
             get_id(character.a.get("href")), # character id
             remove_coma(character.a.text),   # character name
             character.parent.small.text,     # character role
             get_voice_actor(table)           # voice actor information
-            ])        
-    return characters
+            ])
+    
+    return [AnimeCharacter(*c) for c in characters]
 
 
 def get_voice_actor(table)-> Dict[str, str]:
@@ -100,37 +101,6 @@ def get_voice_actor(table)-> Dict[str, str]:
         }
     return {"id": "N/A","name": "N/A", "role": "N/A", "url": "N/A"}
 
-
-
-async def get_character(html: str)-> List:
-    start = '<h2 class="normal_header" style="height: 15px;">'
-    end = '<div class="normal_header">'
-
-    #spliting to get the part where the informations are
-    main_content = html.split(start)[1].split(end)[0]
-
-    text_lines = BeautifulSoup(main_content, "html.parser").get_text(separator="\n", strip=True).strip().splitlines()
-    
-    name = text_lines[0]
-    japanese_name = text_lines[1][1:-1]
-    id = BeautifulSoup(html, "html.parser").find("meta", {"property":"og:url"}).get("content") #type: ignore
-
-    return [
-        get_id(id),
-        name,
-        japanese_name,
-        extract_character_bio(text_lines)
-        ]
-
-def extract_character_bio(text_lines):
-
-    attributes = ("Age", "Birthday", "Height", "Weight", "Eye Color", "Blood Type","Occupation", "Team")
-    bio = {
-        key: value.strip()
-        for line in text_lines if ":" in line and (key := line.split(":")[0].strip()) in attributes
-        for value in line.split(":")[1:]
-        }
-    return bio
 
 
 def remove_coma(name: str):
@@ -149,7 +119,7 @@ def get_span_text(soup: BeautifulSoup, info_name: str)->str:
         return "N/A"
 
 
-def parse_anime_search(html):
+def parse_anime_search(html)-> tuple:
     soup = BeautifulSoup(html, "html.parser")
     tag = soup.find("a", "hoverinfo_trigger fw-b fl-l")
     
@@ -157,4 +127,66 @@ def parse_anime_search(html):
     url = tag.get("href") #type: ignore
 
     return (name, url)
+
+def parse_character_search(html)-> tuple:
+    soup = BeautifulSoup(html, "html.parser")
+    tag = soup.find("a")
+    name = tag.text #type: ignore
+    url = tag.get("href") #type: ignore
+    return (name, url)
+
+
+async def parse_the_character(html):
+
+    soup = BeautifulSoup(html, "html.parser")
+    url = soup.find("meta", {"property":"og:url"}).get("content") #type: ignore
+    img = soup.find("meta", {"property": "og:image"}).get("content") #type: ignore
+    match = re.search(r"Member Favorites:\s*([\d,]+)", soup.get_text())
+    # Remove commas for integer conversion
+    member_favorites = match.group(1).replace(",", "")  #type: ignore
+    start = '<h2 class="normal_header" style="height: 15px;">'
+    end = '<div class="normal_header">'
+
+    html = html.split(start)[1].split(end)[0]
+    soup = BeautifulSoup(html, "html.parser")
+
+    for spoiler in soup.find_all("div", "spoiler"):
+        spoiler.decompose()
+
+    cleaned_text = str(soup)
+    pattern = r".*?:\s*<br\s*/?>\n?"  # Matches "Text: <br>" or "Text:<br/>" followed by an optional newline
+    cleaned_text = re.sub(pattern, "", cleaned_text)
+    soup = BeautifulSoup(cleaned_text, "html.parser")
+
+
+    # removing <br> to prepare `about` dictionary
+    clean_content = "".join(cleaned_text.split("<br/>"))
+    soup_for_texts = BeautifulSoup(clean_content, "html.parser")
+
+    # spliting to get the names and character `about`
+    lines = soup_for_texts.get_text("\n").splitlines()
+    name, japanese_name = lines[0], lines[1]
+
+    # dictionary may contain age, height, Weight etc.
+    about = {
+        key: value.strip() for line in lines if ":" in line and len(line) <40 and "(Source" not in line for key, value in [line.split(':')]
+    }
+    # spliting the soup for character description
+    pure_texts = soup_for_texts.get_text(strip=True)
+
+    #getting last item of dict to split description
+    k, v = next(reversed(about.items()))
+    # last_item = f'{k}: {v}'
+    description = "".join(pure_texts.split(f'{k}: {v}')[1:]).strip()
+
+    return Character(
+        get_id(url),
+        name,
+        japanese_name,
+        about,
+        description,
+        img, #type: ignore
+        member_favorites,
+        url #type: ignore
+    )
 

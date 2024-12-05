@@ -12,7 +12,7 @@ This project is a Python library for scraping and parsing anime data from MyAnim
 .. admonition:: warning
    :class: warning
 
-   This library needs python 3.10 +
+   This library requires python 3.10 +
 
 
 Features
@@ -22,15 +22,6 @@ Features
 - Supports asynchronous fetching
 - Fast 🚀
 
-Contents
---------
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   Scraper
-   _model
-   usage
 
 Installation
 ------------
@@ -43,4 +34,15 @@ To install the library, use:
 
    # Windows
    py -3 -m pip install -U AnimeScraper
+
+
+Contents
+--------
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   Scraper
+   _model
+   usage
 

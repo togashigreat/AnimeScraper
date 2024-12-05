@@ -4,12 +4,10 @@ from typing import Optional
 from rapidfuzz import fuzz, process
 from urllib.parse import quote
 
-from ._parse_anime_data import _parse_anime_data, get_character, get_id, parse_anime_search
+from ._parse_anime_data import _parse_anime_data, get_id, parse_anime_search, parse_character_search, parse_the_character
 
 from ._model import (
     Anime,
-    AnimeCharacter,
-    AnimeStats,
     Character
 )
 
@@ -67,7 +65,7 @@ class MalScraper:
             await self.session.close()
 
 
-    async def _fetch(self, url: str)-> str:
+    async def _fetch(self, url: str):
         """
         Fetch the HTML for a specific URL.
 
@@ -88,7 +86,8 @@ class MalScraper:
             if response.status == 404:
                 raise ValueError(f"No data found with URL: {url}")
             html = await response.text()
-        return html
+            return html
+
 
 
     async def get_anime(self, anime_id: str)->Anime:
@@ -105,9 +104,9 @@ class MalScraper:
         url = f"{self.BASE_URL}/anime/{anime_id}"
 
         html = await self._fetch(url)
-        parsed_anime_data = await _parse_anime_data(html)
 
-        return await self.parse_anime(parsed_anime_data)
+        return await _parse_anime_data(html)
+
 
 
     async def get_character(self, character_id: str)-> Character:
@@ -124,40 +123,10 @@ class MalScraper:
         url = f"{self.BASE_URL}/character/{character_id}"
 
         html = await self._fetch(url)
-        character_details = await get_character(html)
 
-        return Character(*character_details)
+        character_details = await parse_the_character(html)
 
-
-    async def parse_anime(self, parsed_anime_data: dict)-> Anime:
-        """
-        Convert parsed data into an Anime object.
-
-        Args:
-            parsed_anime_data (dict): Parsed data of the anime.
-
-        Returns:
-            Anime: An object containing detailed anime information.
-        """
-        return Anime(
-            id=parsed_anime_data["id"],
-            title=parsed_anime_data["title"],
-            english_title=parsed_anime_data["english_title"],
-            japanese_title=parsed_anime_data["japanese_title"],
-            anime_type=parsed_anime_data["anime_type"],
-            episodes=parsed_anime_data["episodes"],
-            status=parsed_anime_data["status"],
-            aired=parsed_anime_data["aired"],
-            duration=parsed_anime_data["duration"],
-            premiered=parsed_anime_data["premiered"],
-            rating=parsed_anime_data["rating"],
-            synopsis=parsed_anime_data["synopsis"],
-            genres=parsed_anime_data["genres"],
-            studios=parsed_anime_data["studios"],
-            themes=parsed_anime_data["themes"],
-            stats=AnimeStats(*parsed_anime_data["stats"]),
-            characters=[AnimeCharacter(*character) for character in parsed_anime_data["characters"]]
-        )
+        return character_details
 
 
     def normalize(self, text)-> str:
@@ -173,7 +142,7 @@ class MalScraper:
 
     async def search_anime(self, query: str):
         """
-        Searchss anime by name in myanimelist.net
+        Search anime by name in myanimelist.net
 
         Args:
             query (str): The name of the anime.
@@ -198,6 +167,35 @@ class MalScraper:
         url = allanime[index][1]
 
         return await self.get_anime(get_id(url))
+
+
+
+    async def search_character(self, query: str):
+        """
+        Search Character by name in myanimelist.net
+
+        Args:
+            query (str): The name of the Character.
+
+        Returns:
+            Character: A Character object with The Character Details.
+        """
+
+        url = f"{self.BASE_URL}/character.php?q={query}&cat=character"
+        html = await self._fetch(url)
+        start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
+        end = '</table>'
+
+        # getting all the Character row from table of search results
+        table = html.split(start)[1].split(end)[0].split('width="175">', 8)
+        chars = tuple((parse_character_search(x) for x in table))
+
+        names = tuple((self.normalize(x[0]) for x in chars))
+
+        # if match rate higher than 50 return match else first char
+        matched = self.get_close_match(query, names)
+        index = matched[2] if matched[1] > 50 else 0
         
+        url = chars[index][1]
 
-
+        return await self.get_character(get_id(url))
