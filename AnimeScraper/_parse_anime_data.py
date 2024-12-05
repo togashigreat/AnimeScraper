@@ -119,14 +119,13 @@ def get_span_text(soup: BeautifulSoup, info_name: str)->str:
         return "N/A"
 
 
-def parse_anime_search(html)-> tuple:
+def parse_anime_search(html)-> List:
     soup = BeautifulSoup(html, "html.parser")
-    tag = soup.find("a", "hoverinfo_trigger fw-b fl-l")
-    
-    name = tag.text #type: ignore
-    url = tag.get("href") #type: ignore
+    data = [
+        [tag.text, tag.get("href")] for tag in soup.find_all("a", "hoverinfo_trigger fw-b fl-l")
+    ]
 
-    return (name, url)
+    return data
 
 def parse_character_search(html)-> tuple:
     soup = BeautifulSoup(html, "html.parser")

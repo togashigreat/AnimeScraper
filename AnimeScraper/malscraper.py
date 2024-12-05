@@ -156,16 +156,15 @@ class MalScraper:
         end = '<td class="borderClass bgColor1" valign="top" width="50">'
 
         # spliting and getting table contents remove useless codes
-        anime_lists = html.split(start)[1].split(end, 10)[1:-1]
+        anime_lists = "".join(html.split(start)[1].split(end, 9)[1:-1])
         # ((anime name, anime url)) tuple
-        allanime = tuple((parse_anime_search(i) for i in anime_lists))
+        allanime = parse_anime_search(anime_lists)
         animeNames = tuple((x[0] for x in allanime))
 
         matched = self.get_close_match(query, animeNames)
         # if match rate > 50 return matched anime else first anime from list
         index = matched[2] if matched[1] > 50 else 0
         url = allanime[index][1]
-
         return await self.get_anime(get_id(url))
 
 
