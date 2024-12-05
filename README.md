@@ -1,3 +1,5 @@
+<div align="center">
+
 # AnimeScraper
 
 ![AnimeScraper Logo](./docs/assets/icon.svg)
@@ -7,6 +9,14 @@
 
 
 **AnimeScraper** is an Open Source Python library designed for scraping and parsing anime-related data from MyAnimeList. With support for asynchronous requests, it allows you to fetch detailed information about anime, characters, and more efficiently.
+
+</div>
+
+> [!NOTE]
+>
+> Feel free to make any suggestion : )
+> New Features are coming soon....📜
+
 
 ## 🚀 Features
 
