@@ -9,7 +9,7 @@
 project = 'AnimeScraper'
 copyright = '2024, Muhammad MuQiT'
 author = 'Muhammad MuQiT'
-release = "1.0.5"
+release = "1.0.6"
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -51,7 +51,8 @@ templates_path = ['_templates']
 exclude_patterns = [
     '_parse_anime_data.py',
     'tests/*',
-    'malscraper.py'
+    'malscraper.py',
+    'sync_malscraper.py'
 ]
 
 
@@ -69,7 +70,7 @@ html_css_files = [
 ]
 
 html_logo = "../assets/AnimeScraper.png"
-
+html_favicon = "../assets/AnimeScraper.png"
 
 html_theme_options = {
     "light_css_variables": {

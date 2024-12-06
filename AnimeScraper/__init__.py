@@ -1,10 +1,11 @@
 from .Scraper import KunYu
+from .SyncScraper import SyncKunYu
 
-__all__ = ["KunYu"]
+__all__ = ["KunYu", "SyncKunYu"]
 
 # Package metadata
-__version__ = "1.0.0"
-__author__ = "MuQiT"
+__version__ = "1.0.6"
+__author__ = "Muhammad MuQiT"
 __email__ = "antasata678@gmail.com"
-__license__ = "MIT"
+__license__ = "GPL-V3.0"
 

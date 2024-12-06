@@ -1,4 +1,4 @@
-Main Class
+Async Scraper
 =============
 
 Scraper Module

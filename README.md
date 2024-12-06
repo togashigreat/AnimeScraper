@@ -15,6 +15,7 @@
 > [!NOTE]
 >
 > Feel free to make any suggestion : )
+>
 > New Features are coming soon....📜
 
 
@@ -22,9 +23,10 @@
 
 - Fetch detailed anime information
 - Retrieve character details
-- Asynchronous data retrieval
+- Asynchronous Fast data retrieval
 - Easy-to-use API
 - Fully typed and documented
+- Supports Synchronous as well
 
 ## 🛠️ Installation
 
@@ -36,6 +38,36 @@ pip install animescraper
 
 ## 📖 Quick Start
 
+### Synchronous
+
+
+**Searching and Fetching Anime**
+
+```python
+from AnimeScraper import SyncKunYu
+
+scraper = SyncKunYu()
+anime = scraper.search_anime("Chuunibyo demo koi ga shita")
+
+print(anime.title)
+print(anime.stats.rank)
+
+```
+**Searching and fetching Character**
+
+```python
+from AnimeScraper import SyncKunYu
+
+scraper = SyncKunYu()
+character = scraper.search_character("Takanashi Rikka")
+
+print(character.about)
+print(character.description)
+```
+
+
+### Asynchronous
+
 
 **Searching Anime** 
 
@@ -44,13 +76,10 @@ import asyncio
 from AnimeScraper import KunYu
 
 async def main():
-
     scraper = KunYu()
-    # Fetch anime detials by name
     anime = await scraper.search_anime("violet evergarden")  # Violet Evergarden
     print(anime.title)
     print(anime.synopsis)
-    print(anime.stats.score)
     print(anime.characters[0].name)
 
 asyncio.run(main())
@@ -64,15 +93,11 @@ import asyncio
 from AnimeScraper import KunYu
 
 async def main():
-
     scraper = KunYu()
     # Search and Fetch Character detials by name
     character = await scraper.search_character("Killua Zoldyck")
-
     print(character.name)
     print(character.url)
-    print(character.description)
-    print(character.about)
 
 asyncio.run(main())
 ```
@@ -87,28 +112,14 @@ from AnimeScraper import KunYu
 async def main():
     # Use async Context manager to fetch multiple anime with same session
     async with KunYu() as scraper:
-        # Fetch anime details by ID
         anime = await scraper.get_anime("32281")  # Fullmetal Alchemist: Brotherhood
-        print(anime.title)
-        print(anime.synopsis)
         print(anime.stats.score)
         print(anime.characters[0].name)
 
 asyncio.run(main())
 
 ```
-**Fetching Character Details**
 
-```python
-async def get_character():
-    scraper = KunYu()
-        # Fetch character details by ID
-    character = await scraper.get_character("11")  # Edward Elric
-    print(character.name)
-    print(character.japanese_name)
-
-asyncio.run(get_character())
-```
 ## 📖 Documentation
 
 Detailed documentation is available. [Check out the Documentation](https://animescraper.readthedocs.io/en/latest/)
@@ -123,8 +134,9 @@ Detailed documentation is available. [Check out the Documentation](https://anime
 
 ## 🔧 Requirements
 
-- Python 3.8+
+- Python 3.10+
 - aiohttp
+- httpx
 
 ## 📦 Project Structure
 
@@ -143,7 +155,7 @@ AnimeScraper/
 ```
 ## 📄 License
 
-Distributed under the MIT License. See LICENSE for more information.
+Distributed under the GPL-V3.0 License. See [LICENSE](./LICENSE.md) for more information.
 
 ## 📞 Contact
 

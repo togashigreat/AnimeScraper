@@ -1,5 +1,5 @@
 import pytest
-from AnimeScraper import KunYu
+from AnimeScraper import KunYu, SyncKunYu
 
 
 @pytest.mark.asyncio
@@ -36,7 +36,15 @@ async def test_get_character():
         character = await scraper.get_character("1")  # Test with a known character ID (e.g., ID 1)
         assert character.id == "1", "Character ID mismatch"
         assert character.name, "Character name should not be empty"
-        assert isinstance(character.information, dict), "Character information should be a dictionary"
+        assert isinstance(character.about, dict), "Character information should be a dictionary"
+
+def test_search_character():
+    """
+    Test fetching sync from MAL
+    """
+    scraper = SyncKunYu()
+    character = scraper.search_character("Togashi Yuuta")
+    assert character.name.strip() == "Yuuta Togashi", "Character name mismatch"
 
 def test_import():
     """

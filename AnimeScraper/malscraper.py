@@ -4,7 +4,13 @@ from typing import Optional
 from rapidfuzz import fuzz, process
 from urllib.parse import quote
 
-from ._parse_anime_data import _parse_anime_data, get_id, parse_anime_search, parse_character_search, parse_the_character
+from ._parse_anime_data import (
+    get_id,
+    _parse_anime_data,  
+    parse_anime_search, 
+    parse_character_search, 
+    parse_the_character
+)
 
 from ._model import (
     Anime,
@@ -105,7 +111,7 @@ class MalScraper:
 
         html = await self._fetch(url)
 
-        return await _parse_anime_data(html)
+        return _parse_anime_data(html)
 
 
 
@@ -124,7 +130,7 @@ class MalScraper:
 
         html = await self._fetch(url)
 
-        character_details = await parse_the_character(html)
+        character_details = parse_the_character(html)
 
         return character_details
 

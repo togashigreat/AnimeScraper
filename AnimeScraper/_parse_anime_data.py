@@ -2,7 +2,9 @@ import re
 from bs4 import BeautifulSoup
 from typing import Dict, List
 from ._model import Anime, AnimeCharacter, AnimeStats, Character
-async def _parse_anime_data(html: str)-> Anime:
+from rapidfuzz import process, fuzz
+
+def _parse_anime_data(html: str)-> Anime:
 
     soup = BeautifulSoup(html, "html.parser")
     anime_id = soup.find("input", attrs={"name": "aid"}).attrs["value"] # type: ignore
@@ -30,8 +32,8 @@ async def _parse_anime_data(html: str)-> Anime:
         genres = soup.find("span", "dark_text", string="Genre:")
     genres_list = [a.string for a in genres.parent.find_all("a")] if genres else None # type: ignore 
 
-    anime_stats = await get_anime_stats(soup)
-    anime_characters = await _anime_characters(soup)
+    anime_stats = get_anime_stats(soup)
+    anime_characters = _anime_characters(soup)
 
     return Anime(
         anime_id,
@@ -55,7 +57,7 @@ async def _parse_anime_data(html: str)-> Anime:
 
 
 
-async def get_anime_stats(soup: BeautifulSoup)-> AnimeStats:
+def get_anime_stats(soup: BeautifulSoup)-> AnimeStats:
     score = soup.find("span", attrs={"itemprop": "ratingValue"}).text #type: ignore
     scored_by = soup.find("span", attrs={"itemprop": "ratingCount"}).text #type: ignore
     popularity = get_span_text(soup, "Popularity")
@@ -72,7 +74,7 @@ async def get_anime_stats(soup: BeautifulSoup)-> AnimeStats:
     )
 
 
-async def _anime_characters(soup)-> List[AnimeCharacter]:
+def _anime_characters(soup)-> List[AnimeCharacter]:
 
     tables = soup.find("div", "detail-characters-list clearfix").find_all("table", attrs={"width":"100%"}) #type: ignore    
     characters = []
@@ -135,7 +137,7 @@ def parse_character_search(html)-> tuple:
     return (name, url)
 
 
-async def parse_the_character(html):
+def parse_the_character(html):
 
     soup = BeautifulSoup(html, "html.parser")
     url = soup.find("meta", {"property":"og:url"}).get("content") #type: ignore
@@ -189,3 +191,10 @@ async def parse_the_character(html):
         url #type: ignore
     )
 
+
+def normalize(text)-> str:
+    return re.sub(r"[^a-zA-Z0-9\s]", "", text).lower()
+
+
+def get_close_match(self, query, lists):
+    return process.extractOne(normalize(query), lists, scorer=fuzz.ratio)

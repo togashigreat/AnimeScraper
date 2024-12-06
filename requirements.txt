@@ -1,3 +1,4 @@
 aiohttp
+httpx
 beautifulsoup4
 rapidfuzz
