@@ -1,4 +1,5 @@
 aiohttp
+httpx
 Sphinx
 Sphinx-rtd-theme
 furo
