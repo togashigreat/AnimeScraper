@@ -1,3 +1,4 @@
+aiolimiter
 aiohttp
 httpx
 Sphinx
