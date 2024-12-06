@@ -5,7 +5,7 @@ This module contains the **KunYu()** class, which acts as the primary entry poin
 for interacting with `Myanimelist <https://myanimelist.net/>`__ data, as well as helper classes and functions.
 """
 
-from typing import Optional
+from typing import List, Optional
 import aiohttp
 
 from ._model import Anime, Character
@@ -92,6 +92,21 @@ class KunYu:
         async with MalScraper(session=self.shared_session) as scraper:
             character = await scraper.get_character(character_id)
             return character
-    
 
 
+    async def search_batch_anime(self, anime_names: List):
+        """
+        Fetches multiple anime in batch.
+
+        Args:
+            anime_names (List): List of anime names.
+
+        Returns:
+            List (List[Anime]): Returns a list of Anime class object with anime details.
+
+        """
+
+        async with MalScraper(self.shared_session) as scraper:
+            batch_anime = await scraper.search_batch_anime(anime_names)
+            return batch_anime
+        

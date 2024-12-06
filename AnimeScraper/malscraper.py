@@ -1,6 +1,6 @@
 import re
-import aiohttp
-from typing import Optional
+import aiohttp, asyncio
+from typing import Optional, List
 from rapidfuzz import fuzz, process
 from urllib.parse import quote
 
@@ -204,3 +204,22 @@ class MalScraper:
         url = chars[index][1]
 
         return await self.get_character(get_id(url))
+
+
+
+    async def search_batch_anime(self, anime_names: List)-> List[Anime]:
+        """
+        Fetches multiple anime in batch.
+
+        Args:
+            anime_names (List): List of anime names.
+
+        Returns:
+            List (List[Anime]): Returns a list of Anime class object with anime details.
+
+        """
+
+        tasks = [asyncio.create_task(self.search_anime(name)) for name in anime_names]
+        animes = await asyncio.gather(*tasks)
+
+        return [anime for anime in animes]
