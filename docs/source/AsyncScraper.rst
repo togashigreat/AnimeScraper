@@ -3,7 +3,7 @@ Async Scraper
 
 Scraper Module
 --------------
-.. automodule:: AnimeScraper.Scraper
+.. automodule:: AnimeScraper.AsyncScraper
    :exclude-members: Anime, AnimeCharacter, Character, AnimeStats
 
    .. rubric:: Classes

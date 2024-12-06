@@ -9,7 +9,7 @@ from typing import List, Optional
 import aiohttp
 
 from ._model import Anime, Character
-from .malscraper import MalScraper
+from .async_malscraper import MalScraper
 
 class KunYu:
     """
@@ -19,18 +19,21 @@ class KunYu:
 
     """
 
+
+
     def __init__(self) -> None:
         self.shared_session: Optional[aiohttp.ClientSession] = None
     
 
     async def __aenter__(self):
-        self.shared_session = aiohttp.ClientSession(headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1"
-})
+        self.shared_session = aiohttp.ClientSession(
+            headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1"
+            })
         return self
 
 
@@ -94,7 +97,7 @@ class KunYu:
             return character
 
 
-    async def search_batch_anime(self, anime_names: List):
+    async def search_batch_anime(self, anime_names: List)-> List[Anime]:
         """
         Fetches multiple anime in batch.
 
@@ -102,11 +105,29 @@ class KunYu:
             anime_names (List): List of anime names.
 
         Returns:
-            List (List[Anime]): Returns a list of Anime class object with anime details.
+            List[Anime]: Returns a list of Anime class object with anime details.
 
         """
 
         async with MalScraper(self.shared_session) as scraper:
             batch_anime = await scraper.search_batch_anime(anime_names)
-            return batch_anime
+            return batch_anime 
+
+
+
+    async def search_batch_character(self, character_names: List)-> List[Character]:
+        """
+        Fetches multiple characters in batch.
+
+        Args:
+            character_names (List): List of characters name.
+
+        Returns:
+            List[Character]: Returns a list of Character class object with characters details.
+
+        """
+
+        async with MalScraper(self.shared_session) as scraper:
+            batch_characters = await scraper.search_batch_character(character_names)
+            return batch_characters
         

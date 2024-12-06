@@ -1,15 +1,17 @@
-import re
 import aiohttp, asyncio
 from typing import Optional, List
-from rapidfuzz import fuzz, process
 from urllib.parse import quote
+from aiolimiter import AsyncLimiter
+from aiohttp import ClientTimeout
 
 from ._parse_anime_data import (
     get_id,
     _parse_anime_data,  
     parse_anime_search, 
     parse_character_search, 
-    parse_the_character
+    parse_the_character,
+    get_close_match,
+    normalize
 )
 
 from ._model import (
@@ -28,8 +30,15 @@ class MalScraper:
         session (Optional[aiohttp.ClientSession]): The session used for HTTP requests.
     """
     BASE_URL = "https://myanimelist.net"
+    HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1"
+}
 
-    def __init__(self, session: Optional[aiohttp.ClientSession] = None) -> None:
+    def __init__(self, session: Optional[aiohttp.ClientSession] = None, timeout: int = 10) -> None:
         """
         Initializes the scraper with an optional aiohttp session.
 
@@ -38,6 +47,8 @@ class MalScraper:
         """
         self.session = session
         self.own_session = session is None # True if this instance manages its own session
+        self.limiter = AsyncLimiter(5, 1)
+        self.timeout = ClientTimeout(total=timeout)
 
     async def __aenter__(self):
         """
@@ -47,13 +58,7 @@ class MalScraper:
             MalScraper: The current instance with an initialized session.
         """
         if not self.session:
-            self.session = aiohttp.ClientSession(headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Connection": "keep-alive",
-    "Upgrade-Insecure-Requests": "1"
-})
+            self.session = aiohttp.ClientSession(headers=self.HEADERS)
         return self
 
 
@@ -88,11 +93,12 @@ class MalScraper:
 
         if not self.session:
             raise RuntimeError("Session not initialized. Use async with context. ")
-        async with self.session.get(url) as response:
-            if response.status == 404:
-                raise ValueError(f"No data found with URL: {url}")
-            html = await response.text()
-            return html
+        async with self.limiter:
+            async with self.session.get(url, timeout=self.timeout) as response:
+                if response.status == 404:
+                    raise ValueError(f"No data found with URL: {url}")
+                html = await response.text()
+                return html
 
 
 
@@ -135,12 +141,6 @@ class MalScraper:
         return character_details
 
 
-    def normalize(self, text)-> str:
-        return re.sub(r"[^a-zA-Z0-9\s]", "", text).lower()
-
-
-    def get_close_match(self, query, lists):
-        return process.extractOne(self.normalize(query), lists, scorer=fuzz.ratio)
     def save(self, html, path):
         with open(path, "w") as f:
             f.write(html)
@@ -167,9 +167,9 @@ class MalScraper:
         allanime = parse_anime_search(anime_lists)
         animeNames = tuple((x[0] for x in allanime))
 
-        matched = self.get_close_match(query, animeNames)
+        matched = get_close_match(query, animeNames)
         # if match rate > 50 return matched anime else first anime from list
-        index = matched[2] if matched[1] > 50 else 0
+        index = matched[2] if matched[1] > 60 else 0
         url = allanime[index][1]
         return await self.get_anime(get_id(url))
 
@@ -195,10 +195,10 @@ class MalScraper:
         table = html.split(start)[1].split(end)[0].split('width="175">', 8)
         chars = tuple((parse_character_search(x) for x in table))
 
-        names = tuple((self.normalize(x[0]) for x in chars))
+        names = tuple((normalize(x[0]) for x in chars))
 
         # if match rate higher than 50 return match else first char
-        matched = self.get_close_match(query, names)
+        matched = get_close_match(query, names)
         index = matched[2] if matched[1] > 50 else 0
         
         url = chars[index][1]
@@ -215,7 +215,7 @@ class MalScraper:
             anime_names (List): List of anime names.
 
         Returns:
-            List (List[Anime]): Returns a list of Anime class object with anime details.
+            List[Anime]: Returns a list of Anime class object with anime details.
 
         """
 
@@ -223,3 +223,22 @@ class MalScraper:
         animes = await asyncio.gather(*tasks)
 
         return [anime for anime in animes]
+
+
+    
+    async def search_batch_character(self, character_names: List)-> List[Character]:
+        """
+        Fetches multiple characters in batch.
+
+        Args:
+            character_names (List): List of character names.
+
+        Returns:
+            List[Character]: Returns a list of Anime class object with anime details.
+
+        """
+
+        tasks = [asyncio.create_task(self.search_character(name)) for name in character_names]
+        characters = await asyncio.gather(*tasks)
+
+        return [anime for anime in characters]

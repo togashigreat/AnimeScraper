@@ -196,5 +196,7 @@ def normalize(text)-> str:
     return re.sub(r"[^a-zA-Z0-9\s]", "", text).lower()
 
 
-def get_close_match(self, query, lists):
+def get_close_match(query, lists):
     return process.extractOne(normalize(query), lists, scorer=fuzz.ratio)
+
+

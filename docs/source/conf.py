@@ -9,7 +9,7 @@
 project = 'AnimeScraper'
 copyright = '2024, Muhammad MuQiT'
 author = 'Muhammad MuQiT'
-release = "1.0.6"
+release = "1.0.7"
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -51,7 +51,7 @@ templates_path = ['_templates']
 exclude_patterns = [
     '_parse_anime_data.py',
     'tests/*',
-    'malscraper.py',
+    'async_malscraper.py',
     'sync_malscraper.py'
 ]
 
@@ -61,6 +61,9 @@ exclude_patterns = [
 
 html_theme = 'furo'
 html_static_path = ['_static']
+
+
+html_show_sourcelink = False
 
 
 html_css_files = [
