@@ -22,6 +22,13 @@ class AnimeCharacter:
     role: Optional[str]
     voice_actor: Dict[str, str]
 
+    def _to_dict(self):
+        return self.__dict__
+    
+    @classmethod
+    def _from_dict(cls, data: dict):
+        return cls(**data)
+
 @dataclass 
 class Character:
     """
@@ -46,6 +53,12 @@ class Character:
     favorites: str
     url: str
 
+    def _to_dict(self):
+        return self.__dict__
+
+    @classmethod
+    def _from_dict(cls, data: dict):
+        return cls(**data)
 
 @dataclass
 class AnimeStats:
@@ -66,6 +79,13 @@ class AnimeStats:
     popularity: str
     memebers: str
     favorites: str
+
+    def _to_dict(self):
+        return self.__dict__
+
+    @classmethod
+    def _from_dict(cls, data: dict):
+        return cls(**data)
 
 
 @dataclass 
@@ -109,4 +129,36 @@ class Anime:
     themes: List | None
     stats: AnimeStats
     characters: List[AnimeCharacter]
+
+
+    def _to_dict(self):
+        return {
+            **self.__dict__,
+            "stats": self.stats.__dict__,
+            "characters": [c._to_dict() for c in self.characters]
+        }
+
+    @classmethod
+    def _from_dict(cls, data: dict):
+        stats = AnimeStats._from_dict(data["stats"])
+        characters = [AnimeCharacter._from_dict(char) for char in data["characters"]]
+        return cls(
+            id=data["id"],
+            title=data["title"],
+            english_title=data["english_title"],
+            japanese_title=data["japanese_title"],
+            anime_type=data["anime_type"],
+            episodes=data["episodes"],
+            status=data["status"],
+            aired=data["aired"],
+            duration=data["duration"],
+            premiered=data["premiered"],
+            rating=data["rating"],
+            synopsis=data["synopsis"],
+            genres=data["genres"],
+            studios=data["studios"],
+            themes=data["themes"],
+            stats=stats,
+            characters=characters,
+        )
 

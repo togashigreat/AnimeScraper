@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AnimeScraper"
-version = "1.0.7"
+version = "1.0.8"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["Muhammad MuQiT"]
 readme = "README.md"
@@ -28,6 +28,8 @@ aiohttp = "^3.11.6"
 beautifulsoup4 = "^4.12.1"
 rapidfuzz = "^3.9.6"
 httpx = "^0.28.0"
+aiolimiter = "^1.2.0"
+aiosqlite = "^0.20.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

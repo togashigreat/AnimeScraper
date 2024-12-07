@@ -1,3 +1,5 @@
+aiolimiter
+aiosqlite
 aiohttp
 httpx
 beautifulsoup4

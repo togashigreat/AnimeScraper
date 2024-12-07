@@ -85,5 +85,28 @@ To fetch details of a character:
    asyncio.run(main())
 
 
+Caching
+~~~~~~~~~
+
+If you want to locally cache in storage you can pass ``use_cache = True`` to ``KunYu()`` class. you can specify the database path by passing ``db_path="mycache.db"`` 
+
+
+.. code-block:: python
+
+   #example 3
+   import asyncio
+   from AnimeScraper import KunYu
+
+   async def main():
+      scraper = KunYu(use_cache=True, db_path="cache.db")
+      character = await scraper.get_character("1")
+      anime = await scraper.search_anime("The Garden of words")
+      print(character.name)
+      print(anime.title, anime.id)
+
+   asyncio.run(main())
+
+
+
 .. Note:: You can use ``KunYu()`` class with async conext manager like **example 2** or you can normally define ``KunYu()`` to a variable as we did in **example 3** and in **example 0** whatever you lke. 
 

@@ -3,6 +3,9 @@ from typing import Optional, List
 from urllib.parse import quote
 from aiolimiter import AsyncLimiter
 from aiohttp import ClientTimeout
+import aiosqlite
+
+from ._cache_utils import _get_from_cache, _initialize_database, _store_in_cache
 
 from ._parse_anime_data import (
     get_id,
@@ -38,7 +41,15 @@ class MalScraper:
     "Upgrade-Insecure-Requests": "1"
 }
 
-    def __init__(self, session: Optional[aiohttp.ClientSession] = None, timeout: int = 10) -> None:
+    def __init__(
+        self, 
+        session: Optional[aiohttp.ClientSession] = None,
+        use_cache: bool = False,
+        db_path: str = "cache.db",
+        max_requests: int = 5,
+        per_second: int = 1,
+        timeout: int = 10
+    ) -> None:
         """
         Initializes the scraper with an optional aiohttp session.
 
@@ -47,8 +58,12 @@ class MalScraper:
         """
         self.session = session
         self.own_session = session is None # True if this instance manages its own session
-        self.limiter = AsyncLimiter(5, 1)
+        self.limiter = AsyncLimiter(max_requests, per_second)
         self.timeout = ClientTimeout(total=timeout)
+        self.use_cache = use_cache
+        self.db_path = db_path
+        self.db: aiosqlite.Connection | None= None
+
 
     async def __aenter__(self):
         """
@@ -59,6 +74,9 @@ class MalScraper:
         """
         if not self.session:
             self.session = aiohttp.ClientSession(headers=self.HEADERS)
+        if self.use_cache:
+            await _initialize_database(self.db_path)
+            self.db = await aiosqlite.connect(self.db_path)
         return self
 
 
@@ -74,6 +92,8 @@ class MalScraper:
         """
         if self.session and self.own_session:
             await self.session.close()
+        if self.db:
+            await self.db.close()
 
 
     async def _fetch(self, url: str):
@@ -112,12 +132,21 @@ class MalScraper:
         Returns:
             Anime: An object containing detailed anime information.
         """
+        if self.use_cache:
+            if not self.db:
+                raise RuntimeError("Database is not initialized")
+            cached_data = await _get_from_cache(self.db, "anime", anime_id)
+            if cached_data:
+                return Anime._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
-
         html = await self._fetch(url)
+        anime =  _parse_anime_data(html)
 
-        return _parse_anime_data(html)
+        if self.use_cache:
+            await _store_in_cache(self.db, "anime", anime_id, Anime._to_dict(anime))
+
+        return anime
 
 
 
@@ -131,19 +160,21 @@ class MalScraper:
         Returns:
             Character: An object containing detailed character information.
         """
+        
+        if self.use_cache:
+            if not self.db:
+                raise RuntimeError("Database is not initialized")
+            cached_data = await _get_from_cache(self.db, "character", character_id)
+            if cached_data:
+                return Character._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
-
         html = await self._fetch(url)
+        character = parse_the_character(html)
 
-        character_details = parse_the_character(html)
-
-        return character_details
-
-
-    def save(self, html, path):
-        with open(path, "w") as f:
-            f.write(html)
+        if self.use_cache:
+            await _store_in_cache(self.db, "character", character_id, Character._to_dict(character))
+        return character
 
 
     async def search_anime(self, query: str):
@@ -171,7 +202,8 @@ class MalScraper:
         # if match rate > 50 return matched anime else first anime from list
         index = matched[2] if matched[1] > 60 else 0
         url = allanime[index][1]
-        return await self.get_anime(get_id(url))
+        return await self.get_anime(get_id(url).strip())
+
 
 
 
@@ -223,7 +255,7 @@ class MalScraper:
         animes = await asyncio.gather(*tasks)
 
         return [anime for anime in animes]
-
+        
 
     
     async def search_batch_character(self, character_names: List)-> List[Character]:

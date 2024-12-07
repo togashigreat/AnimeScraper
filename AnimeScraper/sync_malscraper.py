@@ -1,9 +1,7 @@
 import httpx
 from typing import Optional, List 
 from urllib.parse import quote 
-import re 
-from rapidfuzz import fuzz, process
-
+from concurrent.futures import ThreadPoolExecutor
 
 from ._parse_anime_data import (
     _parse_anime_data,
@@ -150,10 +148,9 @@ class SyncMalScraper():
 
 
     def search_batch_anime(self, anime_names: List[str])-> List[Anime]:
-
-        anime_lists = [self.search_anime(name) for name in anime_names]
-        return anime_lists
-
+        with ThreadPoolExecutor(max_workers=5) as threat:
+            results = threat.map(self.search_anime, anime_names)
+            return [result for result in results]
 
 
     def search_batch_character(self, characters_name: List[str])-> List[Character]:

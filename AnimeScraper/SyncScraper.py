@@ -76,7 +76,7 @@ class SyncKunYu:
             >>>     print(character.name)
 
         Notes:
-            - You can use `with` context manager for same session use.
+            You can use ``with SyncKunYu`` context manager for same session use.
         """
         with SyncMalScraper(client=self.shared_client) as scraper:
             character = scraper.search_character(character_name)

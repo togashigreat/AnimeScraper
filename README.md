@@ -24,6 +24,7 @@
 - Fetch detailed anime information
 - Retrieve character details
 - Asynchronous Fast data retrieval
+- Asynchronous caching
 - Easy-to-use API
 - Fully typed and documented
 - Supports Synchronous as well
