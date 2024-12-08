@@ -13,11 +13,7 @@ from .sync_malscraper import SyncMalScraper
 class SyncKunYu:
 
     """
-    Initial method. If you want to cache the data locally pass ``use_cache=True`` and specify the database path where you want to cache ``db_path='cache.db'. It uses `sqlite3` for storing data.
-
-    Args:
-        use_cache (bool): If data should be cached. (Default: False)
-        db_path: (str): The path of the database. (Default: cache.db)
+    The main Class for interacting with MAL Synchronusly.
     """
     def __init__(
         self, 
@@ -26,6 +22,13 @@ class SyncKunYu:
         timeout: int = 10
     ) -> None:
 
+        """
+        If you want to cache the data locally pass ``use_cache=True`` and specify the database path where you want to cache ``db_path='cache.db'.`` It uses `sqlite3` for storing data.
+
+        Args:
+            use_cache (bool): If data should be cached. (Default: False)
+            db_path: (str): The path of the database. (Default: cache.db)
+        """
 
 
         self.shared_client: Optional[httpx.Client] = None
