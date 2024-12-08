@@ -46,6 +46,12 @@ def test_search_character():
     character = scraper.search_character("Togashi Yuuta")
     assert character.name.strip() == "Yuuta Togashi", "Character name mismatch"
 
+def test_sync_search_anime():
+    with SyncKunYu() as scraper:
+        anime = scraper.search_anime("Clannad")
+        assert anime.id == "2167", "Anime ID mismatch"
+        assert anime.title, "Title shouldn't be empty"
+
 def test_import():
     """
     Test importing the main KunYu class.
