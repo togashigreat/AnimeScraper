@@ -2,7 +2,7 @@
 
 # AnimeScraper
 
-![AnimeScraper Logo](./docs/assets/icon.svg)
+![AnimeScraper Logo](./docs/assets/animescrapper.png)
 
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/AnimeScraper)
@@ -12,22 +12,16 @@
 
 </div>
 
-> [!NOTE]
->
-> Feel free to make any suggestion : )
->
-> New Features are coming soon....📜
-
 
 ## 🚀 Features
 
-- Fetch detailed anime information
-- Retrieve character details
+- Fetch detailed anime and character details
 - Asynchronous Fast data retrieval
-- Asynchronous caching
+- Caching 
 - Easy-to-use API
 - Fully typed and documented
 - Supports Synchronous as well
+- Comes with a Cli too
 
 ## 🛠️ Installation
 
@@ -37,10 +31,23 @@ You can install AnimeScraper using pip:
 pip install animescraper
 ```
 
+## Cli Tool
+You can use AnimeScraper in your command line too. Type `animescraper` for Usage. Available commands `search-anime`, `get-anime`, `search-character` etc.
+
+**Example:**
+
+<div align="center">
+
+![AnimeScraper Cli Demo](./docs/assets/cli_demo_rikka.jpg)
+![AnimeScraper Cli Demo](./docs/assets/cli_demo_anime.jpg)
+
+</div>
+
 ## 📖 Quick Start
 
 ### Synchronous
 
+This library supports both Synchronous and Asynchronous.
 
 **Searching and Fetching Anime**
 

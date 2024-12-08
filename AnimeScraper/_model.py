@@ -124,9 +124,9 @@ class Anime:
     premiered: str
     rating: str # PG-13, R, etc.
     synopsis: str
-    genres: List[str] | None
+    genres: List[str]
     studios: str
-    themes: List | None
+    themes: List[str]
     stats: AnimeStats
     characters: List[AnimeCharacter]
 

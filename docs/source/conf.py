@@ -9,7 +9,7 @@
 project = 'AnimeScraper'
 copyright = '2024, Muhammad MuQiT'
 author = 'Muhammad MuQiT'
-release = "1.0.8"
+release = "1.0.9"
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -53,7 +53,9 @@ exclude_patterns = [
     'tests/*',
     'async_malscraper.py',
     'sync_malscraper.py',
-    '_cache_utils.py'
+    '_cache_utils.py',
+    'cli.py',
+    'exceptions.py'
 ]
 
 

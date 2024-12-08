@@ -29,7 +29,7 @@ class KunYu:
             timeout: int = 10
     ) -> None:
         """
-        Initialisation method.
+        Initial method.
 
         Args:
             use_cache (bool): If data should be cached. (Default: False)

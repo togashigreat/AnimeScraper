@@ -2,7 +2,15 @@ import httpx
 from typing import Optional, List 
 from urllib.parse import quote 
 from concurrent.futures import ThreadPoolExecutor
+import sqlite3
 
+
+from .exceptions import (
+    AnimeNotFoundError, 
+    CharacterNotFoundError, 
+    NetworkError
+)
+from ._cache_utils import _start_database, _from_cache, _store_cache
 from ._parse_anime_data import (
     _parse_anime_data,
     parse_anime_search, 
@@ -17,12 +25,24 @@ from ._model import Anime, Character
 
 
 class SyncMalScraper():
-    BASE_URL = "https://myanimelist.net"
 
-    def __init__(self, client: Optional[httpx.Client] = None) -> None:
+    BASE_URL = "https://myanimelist.net"
+    ANIME = 10 
+    CHARACTER = 20
+
+    def __init__(
+        self, 
+        client: Optional[httpx.Client],
+        use_cache: bool,
+        db_path: str,
+        timeout: int
+        ) -> None:
         self.client = client
         self.own_client = client is None
-
+        self.use_cache = use_cache
+        self.db_path = db_path
+        self.db: sqlite3.Connection | None = None
+        self.timeout = timeout
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
@@ -33,25 +53,37 @@ class SyncMalScraper():
     }
 
     def __enter__(self):
+
         if not self.client:
-            self.client = httpx.Client(headers=self.headers, timeout=10)
+            self.client = httpx.Client(headers=self.headers)
+
+        if self.use_cache:
+            _start_database(self.db_path)
+            self.db = sqlite3.connect(self.db_path)
         return self
+
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.client and self.own_client:
             self.client.close()
+        if self.db:
+            self.db.close()
 
 
-    def _fetch(self, url: str)-> str:
+    def _fetch(self, url: str, req: int, query: str)-> str:
         
         if not self.client:
             raise ValueError("session is not initialised. Use `with SyncMalScraper` for proper initialisation")
-        response = self.client.get(url)
-        if response.status_code == 404:
-            raise ValueError(f"No data found with URL: {url}")
+        try:
+            response = self.client.get(url, timeout=self.timeout)
+            if response.status_code == 404 and self.ANIME == req:
+                raise AnimeNotFoundError(query)
+            elif response.status_code == 404 and self.CHARACTER == req:
+                raise CharacterNotFoundError(query)
+            return response.text
 
-        return response.text
-
+        except httpx.NetworkError as e:
+            raise NetworkError(f"A NetworkError error occurred {e}")
 
 
     def get_anime(self, anime_id: str)->Anime:
@@ -64,12 +96,18 @@ class SyncMalScraper():
         Returns:
             Anime: An object containing detailed anime information.
         """
+        if self.use_cache:
+            cached_data = _from_cache(self.db, "anime", anime_id)
+            if cached_data:
+                return Anime._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
 
-        html = self._fetch(url)
-
-        return _parse_anime_data(html)
+        html = self._fetch(url, self.ANIME, anime_id)
+        anime =  _parse_anime_data(html)
+        if self.use_cache:
+            _store_cache(self.db, "anime", anime_id, Anime._to_dict(anime))
+        return anime
 
 
 
@@ -83,21 +121,26 @@ class SyncMalScraper():
         Returns:
             Character: An object containing detailed character information.
         """
+        
+        if self.use_cache:
+            cached_data = _from_cache(self.db, "character", character_id)
+            if cached_data:
+                return Character._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
-
-        html = self._fetch(url)
-
-        character_details = parse_the_character(html)
-
-        return character_details
+        html = self._fetch(url, self.CHARACTER, character_id)
+        character = parse_the_character(html)
+        if self.use_cache:
+            _store_cache(self.db, "character", character_id, Character._to_dict(character))
+           
+        return character
 
 
 
     def search_anime(self, query: str)-> Anime:
 
         url = f"{self.BASE_URL}/anime.php?q={quote(query)}&cat=anime"
-        html = self._fetch(url)
+        html = self._fetch(url, self.ANIME, query)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '<td class="borderClass bgColor1" valign="top" width="50">'
 
@@ -127,7 +170,7 @@ class SyncMalScraper():
         """
 
         url = f"{self.BASE_URL}/character.php?q={query}&cat=character"
-        html = self._fetch(url)
+        html = self._fetch(url, self.CHARACTER, query)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '</table>'
 

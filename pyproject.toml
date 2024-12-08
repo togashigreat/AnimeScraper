@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "AnimeScraper"
-version = "1.0.8"
+version = "1.0.9"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["Muhammad MuQiT"]
 readme = "README.md"
 repository = "https://github.com/togashigreat/AnimeScraper"
 homepage = "https://github.com/togashigreat/AnimeScraper"
 license = "GPL-V3.0"
-keywords = ["anime", "scraper", "myanimelist", "fetcher", "manga", "anime library", "api"]
+keywords = ["anime", "scraper", "myanimelist", "anime cli", "manga", "anime library", "api", "python anime"]
 packages = [
     { include = "AnimeScraper" }
 ]
@@ -30,6 +30,10 @@ rapidfuzz = "^3.9.6"
 httpx = "^0.28.0"
 aiolimiter = "^1.2.0"
 aiosqlite = "^0.20.0"
+click = "^8.1.7"
+
+[tool.poetry.scripts]
+animescraper = "AnimeScraper.cli:cli"  # <-- Register the CLI command
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

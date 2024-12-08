@@ -4,7 +4,11 @@ from urllib.parse import quote
 from aiolimiter import AsyncLimiter
 from aiohttp import ClientTimeout
 import aiosqlite
-
+from .exceptions import (
+    CharacterNotFoundError,
+    AnimeNotFoundError,
+    NetworkError
+)
 from ._cache_utils import _get_from_cache, _initialize_database, _store_in_cache
 
 from ._parse_anime_data import (
@@ -33,6 +37,10 @@ class MalScraper:
         session (Optional[aiohttp.ClientSession]): The session used for HTTP requests.
     """
     BASE_URL = "https://myanimelist.net"
+    ANIME = 10 # anime
+    CHARACTER = 20 # character
+
+    # needed for proper response from MAL
     HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -43,12 +51,12 @@ class MalScraper:
 
     def __init__(
         self, 
+        use_cache: bool,
+        db_path: str ,
+        max_requests: int,
+        per_second: int,
+        timeout: int,
         session: Optional[aiohttp.ClientSession] = None,
-        use_cache: bool = False,
-        db_path: str = "cache.db",
-        max_requests: int = 5,
-        per_second: int = 1,
-        timeout: int = 10
     ) -> None:
         """
         Initializes the scraper with an optional aiohttp session.
@@ -96,12 +104,14 @@ class MalScraper:
             await self.db.close()
 
 
-    async def _fetch(self, url: str):
+    async def _fetch(self, url: str, req: int, query: str)-> str:
         """
         Fetch the HTML for a specific URL.
 
         Args:
             url (str): URL related to MyAnimeList.
+            req (int): CHARACTER or ANIME
+            query (str): The arguemnt passed to the get/search function (name, id etc.)
 
         Returns:
             str: The HTML content of the anime page.
@@ -113,13 +123,20 @@ class MalScraper:
 
         if not self.session:
             raise RuntimeError("Session not initialized. Use async with context. ")
-        async with self.limiter:
-            async with self.session.get(url, timeout=self.timeout) as response:
-                if response.status == 404:
-                    raise ValueError(f"No data found with URL: {url}")
-                html = await response.text()
-                return html
 
+        async with self.limiter:
+            try:
+                async with self.session.get(url, timeout=self.timeout) as response:
+                    if response.status == 404 and req == self.ANIME:
+                        raise AnimeNotFoundError(query)
+                    elif response.status == 404 and req == self.CHARACTER:
+                        raise CharacterNotFoundError(query)
+
+                    return await response.text()
+
+            except aiohttp.ClientError as e:
+                raise NetworkError(f"Network error occurred: {e}")
+                
 
 
     async def get_anime(self, anime_id: str)->Anime:
@@ -140,7 +157,7 @@ class MalScraper:
                 return Anime._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
-        html = await self._fetch(url)
+        html = await self._fetch(url, self.CHARACTER, anime_id)
         anime =  _parse_anime_data(html)
 
         if self.use_cache:
@@ -169,7 +186,7 @@ class MalScraper:
                 return Character._from_dict(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
-        html = await self._fetch(url)
+        html = await self._fetch(url, self.CHARACTER, character_id)
         character = parse_the_character(html)
 
         if self.use_cache:
@@ -188,7 +205,7 @@ class MalScraper:
             Anime: An Anime object with Anime Details.
         """
         url = f"{self.BASE_URL}/anime.php?q={quote(query)}&cat=anime"
-        html = await self._fetch(url)
+        html = await self._fetch(url, self.ANIME, query)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '<td class="borderClass bgColor1" valign="top" width="50">'
 
@@ -219,7 +236,7 @@ class MalScraper:
         """
 
         url = f"{self.BASE_URL}/character.php?q={query}&cat=character"
-        html = await self._fetch(url)
+        html = await self._fetch(url, self.CHARACTER, query)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '</table>'
 
@@ -255,7 +272,6 @@ class MalScraper:
         animes = await asyncio.gather(*tasks)
 
         return [anime for anime in animes]
-        
 
     
     async def search_batch_character(self, character_names: List)-> List[Character]:

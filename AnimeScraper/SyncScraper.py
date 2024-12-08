@@ -11,13 +11,33 @@ from ._model import Anime, Character
 from .sync_malscraper import SyncMalScraper
 
 class SyncKunYu:
-    """
-    The main class for interacting with MyAnimeList data.
 
     """
+    Initial method. If you want to cache the data locally pass ``use_cache=True`` and specify the database path where you want to cache ``db_path='cache.db'. It uses `sqlite3` for storing data.
 
-    def __init__(self) -> None:
+    Args:
+        use_cache (bool): If data should be cached. (Default: False)
+        db_path: (str): The path of the database. (Default: cache.db)
+    """
+    def __init__(
+        self, 
+        use_cache: bool = False,
+        db_path: str = "cache.db",
+        timeout: int = 10
+    ) -> None:
+
+
+
         self.shared_client: Optional[httpx.Client] = None
+        self.use_cache = use_cache
+        self.db_path = db_path
+        self.timeout = timeout
+        self.Scraper = SyncMalScraper(
+            client=self.shared_client,
+            use_cache=self.use_cache,
+            db_path=self.db_path,
+            timeout=self.timeout,
+        )
     
 
     def __enter__(self):
@@ -54,7 +74,7 @@ class SyncKunYu:
 
         """
 
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             anime = scraper.search_anime(anime_name)
             return anime
 
@@ -78,7 +98,7 @@ class SyncKunYu:
         Notes:
             You can use ``with SyncKunYu`` context manager for same session use.
         """
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             character = scraper.search_character(character_name)
             return character 
 
@@ -93,7 +113,7 @@ class SyncKunYu:
         Returns:
             Anime: An object containing anime details.
         """
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             anime = scraper.get_anime(anime_id)
             return anime
 
@@ -107,7 +127,7 @@ class SyncKunYu:
         Returns:
             Character: An object containing character details.
         """
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             character = scraper.get_character(character_id)
             return character
 
@@ -121,7 +141,7 @@ class SyncKunYu:
             List[Anime]: A list of Anime objects with Anime details.
         """
 
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             anime_list = scraper.search_batch_anime(anime_names)
 
         return anime_list
@@ -138,7 +158,7 @@ class SyncKunYu:
             List[Character]: A list of Character objects with character's details.
         """
 
-        with SyncMalScraper(client=self.shared_client) as scraper:
+        with self.Scraper as scraper:
             batch_characters = scraper.search_batch_character(character_names)
 
         return batch_characters

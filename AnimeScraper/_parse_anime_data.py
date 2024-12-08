@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from typing import Dict, List
 from ._model import Anime, AnimeCharacter, AnimeStats, Character
 from rapidfuzz import process, fuzz
+from .exceptions import CharacterNotFoundError
 
 def _parse_anime_data(html: str)-> Anime:
 
@@ -25,12 +26,12 @@ def _parse_anime_data(html: str)-> Anime:
     theme = soup.find("span", "dark_text", string="Theme:")  # type: ignore
     if theme == None:
         theme = soup.find("span", "dark_text", string="Themes:")
-    theme_list = [i.string for i in theme.parent.find_all("a")] if theme else None # type: ignore 
+    theme_list = [i.string for i in theme.parent.find_all("a")] if theme else ["N/A"] # type: ignore 
     
     genres = soup.find("span", "dark_text", string="Genres:")
     if genres == None:
         genres = soup.find("span", "dark_text", string="Genre:")
-    genres_list = [a.string for a in genres.parent.find_all("a")] if genres else None # type: ignore 
+    genres_list = [a.string for a in genres.parent.find_all("a")] if genres else ["N/A"]  # type: ignore 
 
     anime_stats = get_anime_stats(soup)
     anime_characters = _anime_characters(soup)
@@ -138,6 +139,10 @@ def parse_character_search(html)-> tuple:
 
 
 def parse_the_character(html):
+    # Htto response code: 200 though invalid id/name was given 
+    # Check html before parsing
+    if '<div class="badresult">Invalid ID provided.</div>' in html:
+        raise CharacterNotFoundError("The MAL Character id is Invalid")
 
     soup = BeautifulSoup(html, "html.parser")
     url = soup.find("meta", {"property":"og:url"}).get("content") #type: ignore
@@ -191,6 +196,12 @@ def parse_the_character(html):
         url #type: ignore
     )
 
+def typ(url: str)-> str:
+    """Returns TYPE from url anime, character etc."""
+    if "cat=" in url:
+        return "".join(url.split("=")[-1])
+    else:
+        return "".join(url.split("https://myanimelist.net/")[1].split("/")[0])
 
 def normalize(text)-> str:
     return re.sub(r"[^a-zA-Z0-9\s]", "", text).lower()
