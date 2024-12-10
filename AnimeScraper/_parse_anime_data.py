@@ -8,7 +8,7 @@ from .exceptions import CharacterNotFoundError
 def _parse_anime_data(html: str)-> Anime:
 
     soup = BeautifulSoup(html, "html.parser")
-    anime_id = soup.find("input", attrs={"name": "aid"}).attrs["value"] # type: ignore
+    anime_id = soup.find("input", attrs={"name": "aid"}).attrs["value"] # type: ignore 
 
     title = soup.find("h1", "title-name h1_bold_none").text # type: ignore
     jap_title = get_span_text(soup, "Japanese") 
@@ -21,7 +21,7 @@ def _parse_anime_data(html: str)-> Anime:
     premiered = get_span_text(soup, "Premiered")
     studios = get_span_text(soup, "Studios")
     rating = get_span_text(soup, "Rating")
-    synopsis = soup.find_all("p", attrs={'itemprop': 'description'})[0].text
+    synopsis = soup.find_all("p", attrs={'itemprop': 'description'})[0].text 
 
     theme = soup.find("span", "dark_text", string="Theme:")  # type: ignore
     if theme == None:
@@ -32,6 +32,21 @@ def _parse_anime_data(html: str)-> Anime:
     if genres == None:
         genres = soup.find("span", "dark_text", string="Genre:")
     genres_list = [a.string for a in genres.parent.find_all("a")] if genres else ["N/A"]  # type: ignore 
+
+    producers = soup.find("span", "dark_text", string="Producers:")
+    producers = [a.string for a in producers.parent.find_all("a")] if producers else ["N/A"]#type: ignore
+
+
+    licensors = soup.find("span", "dark_text", string="Licensors:")
+    licensors = [a.string for a in licensors.parent.find_all("a")] if licensors else ["N/A"]#type: ignore
+
+    related = soup.find("div", "entries-tile")
+
+    related_entries = [
+    {''.join(content.find('div', class_='relation').get_text(strip=True).split()): 
+     content.find('div', class_='title').a.get_text(strip=True)} 
+    for content in related.find_all('div', class_='content')]
+
 
     anime_stats = get_anime_stats(soup)
     anime_characters = _anime_characters(soup)
@@ -52,8 +67,11 @@ def _parse_anime_data(html: str)-> Anime:
         genres=genres_list,
         studios=studios,
         themes=theme_list,
+        producers=producers,
+        licensors=licensors,
         stats=anime_stats,
-        characters=anime_characters
+        characters=anime_characters,
+        related=related_entries
     )
 
 

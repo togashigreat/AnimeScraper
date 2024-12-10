@@ -107,8 +107,11 @@ class Anime(BaseModel):
         genres (List[str]): List of genres.
         studios (str): List of studios.
         themes (List[str]): List of themes.
+        producers (List[str]): List of producers.
+        licensors (List[str]): List of licensors.
         stats (AnimeStats): Statistics about the anime.
         characters (List[AnimeCharacter]): List of characters in the anime.
+        related (List[dict[str, str]]): Related anime, movie and manga.
     """
 
     id: str
@@ -126,8 +129,11 @@ class Anime(BaseModel):
     genres: List[str]
     studios: str
     themes: List[str]
+    producers: List[str]
+    licensors: List[str]
     stats: AnimeStats
     characters: List[AnimeCharacter]
+    related: List[dict[str, str]]
 
 
     # def _to_dict(self):

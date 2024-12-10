@@ -66,7 +66,7 @@ class SyncMalScraper():
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.client and self.own_client:
             self.client.close()
-            self.session = None
+            self.client = None
 
         if self.db:
             self.db.close()
