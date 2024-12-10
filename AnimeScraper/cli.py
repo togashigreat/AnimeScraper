@@ -1,15 +1,45 @@
+import os, json
 import click
 import asyncio
+from uvicorn import run as start_server
 from . import KunYu 
 from .exceptions import AnimeNotFoundError, CharacterNotFoundError
+
+
 S = "\x1b[38;5;33m"
 E = "\x1b[0m"
 VA = "\x1b[38;5;203m"
 
+CONFIG_DIR = os.path.join(os.path.expanduser("~"), ".kunyu")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+
+def create_default_config():
+    """Creates the default config file in ~/.kunyu/config.json if it doesn't exist."""
+    if not os.path.exists(CONFIG_DIR):
+        os.makedirs(CONFIG_DIR)
+    if not os.path.exists(CONFIG_FILE):
+        default_config = {
+            "use_cache": False,
+            "db_path": "cache.db",
+            "port": 8000,
+            "host": "127.0.0.1"
+        }
+        with open(CONFIG_FILE, "w") as f:
+            json.dump(default_config, f, indent=4)
+
+
+def load_config():
+    """Loads config from ~/.kunyu/config.json."""
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
 @click.group()
 def cli():
     """AnimeScraper - CLI to fetch and search anime/character details from MyAnimeList."""
-    pass
+    create_default_config()
+
 
 @click.command()
 @click.argument('anime_name')
@@ -123,13 +153,43 @@ def search_character(character_name: str):
     except CharacterNotFoundError as e:
         click.echo(f"Eror: {e}")
 
+
+@click.command()
+@click.option("--host", default=None, help="Host for the API server (overrides config.json)")
+@click.option("--port", default=None, help="Port for the API server (overrides config.json)")
+@click.option("--use-cache", is_flag=True, help="Enable database caching (overrides config.json)")
+@click.option("--db-path", default=None, help="Path for the local SQLite cache database (overrides config.json)")
+def server(host: str, port: int, use_cache: bool, db_path: str):
+    """Start the FastAPI server for AnimeScraper."""
+    
+    # Load from config file and merge with CLI args
+    config = load_config()
+
+    # Override config values with CLI arguments if provided
+    final_host = host if host else config.get("host", "127.0.0.1")
+    final_port = port if port else config.get("port", 8000)
+    final_use_cache = use_cache if use_cache else config.get("use_cache", False)
+    final_db_path = db_path if db_path else config.get("db_path", "cache.db")
+
+    click.echo(f"🚀 Starting server on http://{final_host}:{final_port}")
+    click.echo(f"📁 Database Path: {final_db_path} | 📦 Use Cache: {final_use_cache}")
+    # Pass the user arguments to the server through environment variables
+    os.environ["ANIME_SCRAPER_USE_CACHE"] = str(final_use_cache)
+    os.environ["ANIME_SCRAPER_DB_PATH"] = final_db_path
+
+    # Run the FastAPI server
+    start_server("AnimeScraper.animescraper_server:app", host=final_host, port=int(final_port), reload=True)
+
+        
 # Add all commands to the CLI
 cli.add_command(search_anime)
 cli.add_command(search_character)
 cli.add_command(get_anime)
 cli.add_command(get_character)
-
+cli.add_command(server)
 
 if __name__ == '__main__':
     cli()
+
+
 

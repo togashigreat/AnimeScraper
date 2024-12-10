@@ -4,10 +4,11 @@ Data models for AnimeScraper.
 This module defines data structures for anime, characters, and related entities.
 """
 from typing import Optional, List, Dict
-from dataclasses import dataclass 
+#from dataclasses import dataclass 
+from pydantic import BaseModel
 
-@dataclass
-class AnimeCharacter:
+
+class AnimeCharacter(BaseModel):
     """
     Represents a character in an anime.
 
@@ -22,15 +23,15 @@ class AnimeCharacter:
     role: Optional[str]
     voice_actor: Dict[str, str]
 
-    def _to_dict(self):
-        return self.__dict__
-    
-    @classmethod
-    def _from_dict(cls, data: dict):
-        return cls(**data)
+    # def _to_dict(self):
+    #     return self.__dict__
+    #
+    # @classmethod
+    # def _from_dict(cls, data: dict):
+    #     return cls(**data)
+    #
 
-@dataclass 
-class Character:
+class Character(BaseModel):
     """
     Represents a character with full details.
 
@@ -47,21 +48,20 @@ class Character:
     id: str
     name: str
     japanese_name: Optional[str]
-    about: Dict
+    about: Dict[str, str]
     description: str
     img: str
     favorites: str
     url: str
 
-    def _to_dict(self):
-        return self.__dict__
+    # def _to_dict(self):
+    #     return self.__dict__
+    #
+    # @classmethod
+    # def _from_dict(cls, data: dict):
+    #     return cls(**data)
 
-    @classmethod
-    def _from_dict(cls, data: dict):
-        return cls(**data)
-
-@dataclass
-class AnimeStats:
+class AnimeStats(BaseModel):
     """
     Represents The stats of an Anime.
 
@@ -77,19 +77,18 @@ class AnimeStats:
     scored_by: str
     ranked: str
     popularity: str
-    memebers: str
+    members: str
     favorites: str
 
-    def _to_dict(self):
-        return self.__dict__
+    # def _to_dict(self):
+    #     return self.__dict__
+    #
+    # @classmethod
+    # def _from_dict(cls, data: dict):
+    #     return cls(**data)
+    #
 
-    @classmethod
-    def _from_dict(cls, data: dict):
-        return cls(**data)
-
-
-@dataclass 
-class Anime:
+class Anime(BaseModel):
     """
     Represents an anime.
 
@@ -131,34 +130,34 @@ class Anime:
     characters: List[AnimeCharacter]
 
 
-    def _to_dict(self):
-        return {
-            **self.__dict__,
-            "stats": self.stats.__dict__,
-            "characters": [c._to_dict() for c in self.characters]
-        }
-
-    @classmethod
-    def _from_dict(cls, data: dict):
-        stats = AnimeStats._from_dict(data["stats"])
-        characters = [AnimeCharacter._from_dict(char) for char in data["characters"]]
-        return cls(
-            id=data["id"],
-            title=data["title"],
-            english_title=data["english_title"],
-            japanese_title=data["japanese_title"],
-            anime_type=data["anime_type"],
-            episodes=data["episodes"],
-            status=data["status"],
-            aired=data["aired"],
-            duration=data["duration"],
-            premiered=data["premiered"],
-            rating=data["rating"],
-            synopsis=data["synopsis"],
-            genres=data["genres"],
-            studios=data["studios"],
-            themes=data["themes"],
-            stats=stats,
-            characters=characters,
-        )
-
+    # def _to_dict(self):
+    #     return {
+    #         **self.__dict__,
+    #         "stats": self.stats.__dict__,
+    #         "characters": [c._to_dict() for c in self.characters]
+    #     }
+    #
+    # @classmethod
+    # def _from_dict(cls, data: dict):
+    #     stats = AnimeStats._from_dict(data["stats"])
+    #     characters = [AnimeCharacter._from_dict(char) for char in data["characters"]]
+    #     return cls(
+    #         id=data["id"],
+    #         title=data["title"],
+    #         english_title=data["english_title"],
+    #         japanese_title=data["japanese_title"],
+    #         anime_type=data["anime_type"],
+    #         episodes=data["episodes"],
+    #         status=data["status"],
+    #         aired=data["aired"],
+    #         duration=data["duration"],
+    #         premiered=data["premiered"],
+    #         rating=data["rating"],
+    #         synopsis=data["synopsis"],
+    #         genres=data["genres"],
+    #         studios=data["studios"],
+    #         themes=data["themes"],
+    #         stats=stats,
+    #         characters=characters,
+    #     )
+    #

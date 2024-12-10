@@ -66,6 +66,8 @@ class SyncMalScraper():
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.client and self.own_client:
             self.client.close()
+            self.session = None
+
         if self.db:
             self.db.close()
 
@@ -99,14 +101,14 @@ class SyncMalScraper():
         if self.use_cache:
             cached_data = _from_cache(self.db, "anime", anime_id)
             if cached_data:
-                return Anime._from_dict(cached_data)
+                return Anime.model_validate_json(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
 
         html = self._fetch(url, self.ANIME, anime_id)
         anime =  _parse_anime_data(html)
         if self.use_cache:
-            _store_cache(self.db, "anime", anime_id, Anime._to_dict(anime))
+            _store_cache(self.db, "anime", anime_id, anime.model_dump_json())
         return anime
 
 
@@ -125,13 +127,13 @@ class SyncMalScraper():
         if self.use_cache:
             cached_data = _from_cache(self.db, "character", character_id)
             if cached_data:
-                return Character._from_dict(cached_data)
+                return Character.model_validate_json(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
         html = self._fetch(url, self.CHARACTER, character_id)
         character = parse_the_character(html)
         if self.use_cache:
-            _store_cache(self.db, "character", character_id, Character._to_dict(character))
+            _store_cache(self.db, "character", character_id, character.model_dump_json())
            
         return character
 

@@ -1,5 +1,4 @@
 import aiosqlite
-import json
 import sqlite3
 async def _initialize_database(db_path):
         """
@@ -21,21 +20,21 @@ async def _initialize_database(db_path):
             await db.commit()
 
 
-async def _get_from_cache(db, table: str, key: str):
+async def _get_from_cache(db, table: str, key: str)-> str | None:
         async with db.execute(f"SELECT data FROM {table} WHERE id = ?", (key,)) as cursor:
             row = await cursor.fetchone()
             if row:
-                return json.loads(row[0])  # Return deserialized JSON
+                return row[0]  # Return deserialized JSON
         return None
 
 
 
-async def _store_in_cache(db, table: str, key: str, value: dict):
+async def _store_in_cache(db, table: str, key: str, value: str):
         async with db.execute(f"SELECT 1 FROM {table} WHERE id = ?", (key,)) as cursor:
             row = await cursor.fetchone()
             if row:
                 return  # Skip if the data already exists
-        await db.execute(f"INSERT INTO {table} (id, data) VALUES (?, ?)", (key, json.dumps(value)))
+        await db.execute(f"INSERT INTO {table} (id, data) VALUES (?, ?)", (key, value))
         await db.commit()
 
 
@@ -66,15 +65,15 @@ def _from_cache(db, table: str, key: str):
         row = cursor.fetchone()
         if row:
             print(row[0])
-            return json.loads(row[0])  # Return deserialized JSON
+            return row[0]  # Return deserialized JSON
         return None
 
 
-def _store_cache(db, table: str, key: str, value: dict):
+def _store_cache(db, table: str, key: str, value: str):
         cursor = db.execute(f"SELECT 1 FROM {table} WHERE id = ?", (key,))
         row = cursor.fetchone()
         if row:
             return  # Skip if the data already exists
-        db.execute(f"INSERT INTO {table} (id, data) VALUES (?, ?)", (key, json.dumps(value)))
+        db.execute(f"INSERT INTO {table} (id, data) VALUES (?, ?)", (key, value))
         db.commit()
 

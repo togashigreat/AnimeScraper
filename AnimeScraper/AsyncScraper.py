@@ -55,7 +55,7 @@ class KunYu:
 
 
     async def __aenter__(self):
-        # These Headers are needed in oder to get porper response from MAL.
+        # These Headers are needed in oder to get porper response from MAL
         self.shared_session = aiohttp.ClientSession(
             headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",

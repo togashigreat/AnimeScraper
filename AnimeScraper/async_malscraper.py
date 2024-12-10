@@ -88,7 +88,6 @@ class MalScraper:
         return self
 
 
-
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """
         Exit the context manager and close the session if owned.
@@ -100,6 +99,7 @@ class MalScraper:
         """
         if self.session and self.own_session:
             await self.session.close()
+            self.session = None
         if self.db:
             await self.db.close()
 
@@ -154,14 +154,14 @@ class MalScraper:
                 raise RuntimeError("Database is not initialized")
             cached_data = await _get_from_cache(self.db, "anime", anime_id)
             if cached_data:
-                return Anime._from_dict(cached_data)
+                return Anime.model_validate_json(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
         html = await self._fetch(url, self.CHARACTER, anime_id)
         anime =  _parse_anime_data(html)
 
         if self.use_cache:
-            await _store_in_cache(self.db, "anime", anime_id, Anime._to_dict(anime))
+            await _store_in_cache(self.db, "anime", anime_id, anime.model_dump_json())
 
         return anime
 
@@ -183,14 +183,14 @@ class MalScraper:
                 raise RuntimeError("Database is not initialized")
             cached_data = await _get_from_cache(self.db, "character", character_id)
             if cached_data:
-                return Character._from_dict(cached_data)
+                return Character.model_validate_json(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
         html = await self._fetch(url, self.CHARACTER, character_id)
         character = parse_the_character(html)
 
         if self.use_cache:
-            await _store_in_cache(self.db, "character", character_id, Character._to_dict(character))
+            await _store_in_cache(self.db, "character", character_id, character.model_dump_json())
         return character
 
 
@@ -239,19 +239,15 @@ class MalScraper:
         html = await self._fetch(url, self.CHARACTER, query)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '</table>'
-
         # getting all the Character row from table of search results
         table = html.split(start)[1].split(end)[0].split('width="175">', 8)
         chars = tuple((parse_character_search(x) for x in table))
-
         names = tuple((normalize(x[0]) for x in chars))
 
         # if match rate higher than 50 return match else first char
         matched = get_close_match(query, names)
         index = matched[2] if matched[1] > 50 else 0
-        
         url = chars[index][1]
-
         return await self.get_character(get_id(url))
 
 
@@ -270,7 +266,6 @@ class MalScraper:
 
         tasks = [asyncio.create_task(self.search_anime(name)) for name in anime_names]
         animes = await asyncio.gather(*tasks)
-
         return [anime for anime in animes]
 
     
@@ -288,5 +283,4 @@ class MalScraper:
 
         tasks = [asyncio.create_task(self.search_character(name)) for name in character_names]
         characters = await asyncio.gather(*tasks)
-
         return [anime for anime in characters]

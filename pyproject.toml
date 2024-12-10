@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "AnimeScraper"
-version = "1.1.0"
+version = "1.1.1"
 description = "A Simple library to get Anime and Character information. It scrapes all information from Myanimelist website."
 authors = ["Muhammad MuQiT"]
 readme = "README.md"
@@ -31,6 +31,9 @@ httpx = "^0.28.0"
 aiolimiter = "^1.2.0"
 aiosqlite = "^0.20.0"
 click = "^8.1.7"
+pydantic = "^2.9.0"
+pydantic-core = "2.23.4"
+uvicorn = "0.32.1"
 
 [tool.poetry.scripts]
 animescraper = "AnimeScraper.cli:cli"  # <-- Register the CLI command

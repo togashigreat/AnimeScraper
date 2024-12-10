@@ -22,6 +22,8 @@
 - Fully typed and documented
 - Supports Synchronous as well
 - Comes with a Cli too
+- FastAPI Server with Caching config 
+
 
 ## 🛠️ Installation
 
@@ -32,7 +34,7 @@ pip install animescraper
 ```
 
 ## Cli Tool
-You can use AnimeScraper in your command line too. Type `animescraper` for Usage. Available commands `search-anime`, `get-anime`, `search-character` etc.
+You can use AnimeScraper in your command line too. Type `animescraper` for Usage. Available commands `search-anime`, `get-anime`, `search-character` etc. look at the Documentation for more information.
 
 **Example:**
 
@@ -42,6 +44,8 @@ You can use AnimeScraper in your command line too. Type `animescraper` for Usage
 ![AnimeScraper Cli Demo](./docs/assets/cli_demo_anime.jpg)
 
 </div>
+
+
 
 ## 📖 Quick Start
 
@@ -145,6 +149,8 @@ Detailed documentation is available. [Check out the Documentation](https://anime
 - Python 3.10+
 - aiohttp
 - httpx
+- pydantic
+- uvicorn 
 
 ## 📦 Project Structure
 

@@ -46,6 +46,7 @@ Contents
 
    scrapers
    _model
+   cli
    usage
 
 

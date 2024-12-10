@@ -37,23 +37,23 @@ def _parse_anime_data(html: str)-> Anime:
     anime_characters = _anime_characters(soup)
 
     return Anime(
-        anime_id,
-        title,
-        eng_title,
-        jap_title,
-        anime_type,
-        episodes,
-        status,
-        aired,
-        duration,
-        premiered,
-        rating,
-        synopsis,
-        genres_list,
-        studios,
-        theme_list,
-        anime_stats,
-        anime_characters
+        id=anime_id,
+        title=title,
+        english_title=eng_title,
+        japanese_title=jap_title,
+        anime_type=anime_type,
+        episodes=episodes,
+        status=status,
+        aired=aired,
+        duration=duration,
+        premiered=premiered,
+        rating=rating,
+        synopsis=synopsis,
+        genres=genres_list,
+        studios=studios,
+        themes=theme_list,
+        stats=anime_stats,
+        characters=anime_characters
     )
 
 
@@ -66,12 +66,12 @@ def get_anime_stats(soup: BeautifulSoup)-> AnimeStats:
     favorites = get_span_text(soup, "Favorites")
     ranked = soup.find("span", "numbers ranked").strong.text # type: ignore
     return AnimeStats(
-        score, 
-        scored_by, 
-        ranked, 
-        popularity, 
-        members, 
-        favorites
+        score=score, 
+        scored_by=scored_by, 
+        ranked=ranked, 
+        popularity=popularity, 
+        members=members, 
+        favorites=favorites
     )
 
 
@@ -82,14 +82,15 @@ def _anime_characters(soup)-> List[AnimeCharacter]:
 
     for table in tables:
         character = table.find("h3", "h3_characters_voice_actors")
-        characters.append([
-            get_id(character.a.get("href")), # character id
-            remove_coma(character.a.text),   # character name
-            character.parent.small.text,     # character role
-            get_voice_actor(table)           # voice actor information
-            ])
+
+        characters.append({
+            "id": get_id(character.a.get("href")), # character id
+            "name": remove_coma(character.a.text),   # character name
+            "role": character.parent.small.text,     # character role
+            "voice_actor": get_voice_actor(table)           # voice actor information
+            })
     
-    return [AnimeCharacter(*c) for c in characters]
+    return [AnimeCharacter.model_validate(c) for c in characters]
 
 
 def get_voice_actor(table)-> Dict[str, str]:
@@ -186,14 +187,14 @@ def parse_the_character(html):
     description = "".join(pure_texts.split(f'{k}: {v}')[1:]).strip()
 
     return Character(
-        get_id(url),
-        name,
-        japanese_name,
-        about,
-        description,
-        img, #type: ignore
-        member_favorites,
-        url #type: ignore
+        id=get_id(url),
+        name=name,
+        japanese_name=japanese_name,
+        about=about,
+        description=description,
+        img=img, #type: ignore
+        favorites=member_favorites,
+        url=url #type: ignore
     )
 
 def typ(url: str)-> str:

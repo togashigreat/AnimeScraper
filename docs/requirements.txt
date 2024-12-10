@@ -6,3 +6,5 @@ Sphinx
 Sphinx-rtd-theme
 furo
 rapidfuzz
+uvicorn
+pydantic
