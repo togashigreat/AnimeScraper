@@ -7,7 +7,7 @@ import asyncio, os
 app = FastAPI(
     title="AnimeScraper API", 
     description="API for interacting with MyAnimeList data using AnimeScraper", 
-    version="1.1.2"
+    version="1.1.3"
 )
 
 USE_CACHE = os.getenv("ANIME_SCRAPER_USE_CACHE", "False") == "True"

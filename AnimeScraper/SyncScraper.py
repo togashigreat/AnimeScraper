@@ -5,10 +5,14 @@ This module contains the **SyncKunYu()** class, which acts as the primary entry 
 for interacting with `Myanimelist <https://myanimelist.net/>`__ data, as well as helper classes and functions.
 """
 
+__all__ = ["SyncKunYu"]
+
 from typing import Optional, List
 import httpx
 from ._model import Anime, Character
 from .sync_malscraper import SyncMalScraper
+
+
 
 class SyncKunYu:
 

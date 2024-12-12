@@ -2,7 +2,7 @@ Models
 =============
 
 .. automodule:: AnimeScraper._model
-
+   :exclude-members: model_config
    
    .. rubric:: Classes
 

@@ -5,10 +5,14 @@ This module contains the **KunYu()** class, which acts as the primary entry poin
 for interacting with `Myanimelist <https://myanimelist.net/>`__ data, as well as helper classes and functions.
 """
 
+__all__ = ["KunYu"]
+
 from typing import List, Optional
 import aiohttp
 from ._model import Anime, Character
 from .async_malscraper import MalScraper
+
+
 
 class KunYu:
     """

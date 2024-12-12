@@ -1,3 +1,4 @@
+fastapi
 aiolimiter
 aiosqlite
 aiohttp

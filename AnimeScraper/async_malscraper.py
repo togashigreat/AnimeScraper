@@ -26,6 +26,7 @@ from ._model import (
     Character
 )
 
+
 class MalScraper:
     """
     A class for interacting with MyAnimeList's website.
