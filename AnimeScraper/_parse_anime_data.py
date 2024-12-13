@@ -108,7 +108,7 @@ def _anime_characters(soup)-> List[AnimeCharacter]:
             "voice_actor": get_voice_actor(table)           # voice actor information
             })
     
-    return [AnimeCharacter.model_validate(c) for c in characters]
+    return [AnimeCharacter.from_dict(c) for c in characters]
 
 
 def get_voice_actor(table)-> Dict[str, str]:

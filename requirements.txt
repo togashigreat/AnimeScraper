@@ -6,4 +6,3 @@ httpx
 beautifulsoup4
 rapidfuzz
 uvicorn
-pydantic

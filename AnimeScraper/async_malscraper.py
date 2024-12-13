@@ -155,7 +155,7 @@ class MalScraper:
                 raise RuntimeError("Database is not initialized")
             cached_data = await _get_from_cache(self.db, "anime", anime_id)
             if cached_data:
-                return Anime.model_validate_json(cached_data)
+                return Anime.from_json(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
         html = await self._fetch(url, self.CHARACTER, anime_id)
@@ -184,7 +184,7 @@ class MalScraper:
                 raise RuntimeError("Database is not initialized")
             cached_data = await _get_from_cache(self.db, "character", character_id)
             if cached_data:
-                return Character.model_validate_json(cached_data)
+                return Character.from_json(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
         html = await self._fetch(url, self.CHARACTER, character_id)

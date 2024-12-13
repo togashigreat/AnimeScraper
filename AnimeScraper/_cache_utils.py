@@ -64,7 +64,6 @@ def _from_cache(db, table: str, key: str):
         cursor = db.execute(f"SELECT data FROM {table} WHERE id = ?", (key,))
         row = cursor.fetchone()
         if row:
-            print(row[0])
             return row[0]  # Return deserialized JSON
         return None
 

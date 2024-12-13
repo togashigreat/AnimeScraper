@@ -12,13 +12,14 @@ __all__ = [
     ]
 
 from typing import Optional, List, Dict
-from pydantic import BaseModel
+from dataclasses import dataclass
+import json
 
 
 
 
-
-class AnimeCharacter(BaseModel):
+@dataclass
+class AnimeCharacter:
     # """
     # Represents a character in an anime.
     #
@@ -38,9 +39,16 @@ class AnimeCharacter(BaseModel):
     voice_actor: Dict[str, str]
     """Dictionary containing details about the voice actor."""
 
+    def dict(self):
+        return self.__dict__
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
 
 
-class Character(BaseModel):
+@dataclass
+class Character:
     # """
     # Represents a character with full details.
     #
@@ -73,9 +81,19 @@ class Character(BaseModel):
     url: str 
     """The MAL url of the Character page"""
 
+    def model_dump_json(self):
+        return json.dumps(self.__dict__)
 
+    @classmethod
+    def from_json(cls, data):
+        data = json.loads(data)
+        return cls(**data)
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
 
-class AnimeStats(BaseModel):
+@dataclass
+class AnimeStats:
     # """
     # Represents The stats of an Anime.
     #
@@ -101,10 +119,16 @@ class AnimeStats(BaseModel):
     favorites: str 
     """The number people's favorite anime."""
 
+    def dict(self):
+        return self.__dict__
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
 
 
-
-class Anime(BaseModel):
+@dataclass
+class Anime:
     # """
     # Represents an anime with all its details.
     #
@@ -174,3 +198,56 @@ class Anime(BaseModel):
     related: List[dict[str, str]] 
     """Related works (anime, movies, manga etc.)"""
 
+    def model_dump_json(self):
+        return json.dumps({
+            'id': self.id,
+            'title': self.title,
+            'english_title': self.english_title,
+            'japanese_title': self.japanese_title,
+            'anime_type': self.anime_type,
+            'episodes': self.episodes,
+            'status': self.status,
+            'aired': self.aired,
+            'duration': self.duration,
+            'premiered': self.premiered,
+            'rating': self.rating,
+            'synopsis': self.synopsis,
+            'genres': self.genres,
+            'studios': self.studios,
+            'themes': self.themes,
+            'producers': self.producers,
+            'licensors': self.licensors,
+            'stats': self.stats.dict(),  # Call dict() of AnimeStats
+            'characters': [character.dict() for character in self.characters],  # Call dict() for each character
+            'related': self.related
+        })
+
+
+
+
+    @classmethod
+    def from_json(cls, anime_data: str):
+        data: dict = json.loads(anime_data)
+        characters = [AnimeCharacter.from_dict(d) for d in data["characters"]]   
+        return cls(
+            id=data["id"],
+            title=data["title"],
+            english_title=data["english_title"],
+            japanese_title=data["japanese_title"],
+            anime_type=data["anime_type"],
+            episodes=data["episodes"],
+            status=data["status"],
+            aired=data["aired"],
+            duration=data["duration"],
+            premiered=data["premiered"],
+            rating=data["rating"],
+            synopsis=data["synopsis"],
+            genres=data["genres"],
+            studios=data["studios"],
+            themes=data["themes"],
+            producers=data["producers"],
+            licensors=data["licensors"],
+            stats=AnimeStats.from_dict(data["stats"]),
+            characters=characters,
+            related=data["related"]
+        )
