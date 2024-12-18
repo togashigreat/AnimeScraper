@@ -2,12 +2,21 @@ from fastapi import FastAPI, HTTPException, Depends, Query
 from AnimeScraper import KunYu  # Import KunYu (main entry point)
 from AnimeScraper._model import Anime, Character  # Import response models
 from typing import Dict, Generator, List
-import asyncio, os
+from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+import os
 
 app = FastAPI(
     title="AnimeScraper API", 
     description="API for interacting with MyAnimeList data using AnimeScraper", 
-    version="1.1.5"
+    version="1.1.6"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins, or replace "*" with specific URLs if needed
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 USE_CACHE = os.getenv("ANIME_SCRAPER_USE_CACHE", "False") == "True"
@@ -87,7 +96,7 @@ async def search_character(character_name: str, kunyu_instance: KunYu = Depends(
 
 @app.get("/search-batch-anime/", response_model=List[Anime])
 async def search_batch_anime(
-    anime_names: List[str] = Query(..., description="List of anime names to search", alias="anime_names[]"),
+    anime_names: List[str] = Query(..., description="List of anime names to search"),
     kunyu_instance: KunYu = Depends(get_kunyu_instance)
 ) -> List[Anime]:
     """
@@ -114,7 +123,7 @@ async def search_batch_anime(
 
 @app.get("/search-batch-character/", response_model=List[Character])
 async def search_batch_character(
-    character_names: List[str] = Query(..., description="List of character names to search", alias="character_names[]"),
+    character_names: List[str] = Query(..., description="List of character names to search"),
     kunyu_instance: KunYu = Depends(get_kunyu_instance)
 ) -> List[Character]:
     """
