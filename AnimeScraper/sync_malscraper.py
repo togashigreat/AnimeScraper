@@ -1,5 +1,5 @@
 import httpx
-from typing import Optional, List 
+from typing import Optional, List, Dict
 from urllib.parse import quote 
 from concurrent.futures import ThreadPoolExecutor
 import sqlite3
@@ -18,7 +18,8 @@ from ._parse_anime_data import (
     parse_character_search,
     get_id,
     get_close_match,
-    normalize
+    normalize,
+    parse_top_anime
 )
 
 from ._model import Anime, Character
@@ -72,7 +73,7 @@ class SyncMalScraper():
             self.db.close()
 
 
-    def _fetch(self, url: str, req: int, query: str)-> str:
+    def _fetch(self, url: str, query: str, req: int | None = None)-> str:
         
         if not self.client:
             raise ValueError("session is not initialised. Use `with SyncMalScraper` for proper initialisation")
@@ -105,7 +106,7 @@ class SyncMalScraper():
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
 
-        html = self._fetch(url, self.ANIME, anime_id)
+        html = self._fetch(url, anime_id,self.ANIME)
         anime =  _parse_anime_data(html)
         if self.use_cache:
             _store_cache(self.db, "anime", anime_id, anime.model_dump_json())
@@ -130,7 +131,7 @@ class SyncMalScraper():
                 return Character.from_json(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
-        html = self._fetch(url, self.CHARACTER, character_id)
+        html = self._fetch(url, character_id, self.CHARACTER)
         character = parse_the_character(html)
         if self.use_cache:
             _store_cache(self.db, "character", character_id, character.model_dump_json())
@@ -142,7 +143,7 @@ class SyncMalScraper():
     def search_anime(self, query: str)-> Anime:
 
         url = f"{self.BASE_URL}/anime.php?q={quote(query)}&cat=anime"
-        html = self._fetch(url, self.ANIME, query)
+        html = self._fetch(url, query,self.ANIME)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '<td class="borderClass bgColor1" valign="top" width="50">'
 
@@ -172,7 +173,7 @@ class SyncMalScraper():
         """
 
         url = f"{self.BASE_URL}/character.php?q={query}&cat=character"
-        html = self._fetch(url, self.CHARACTER, query)
+        html = self._fetch(url, query,self.CHARACTER)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '</table>'
 
@@ -202,3 +203,20 @@ class SyncMalScraper():
 
         characters_lists = [self.search_character(name) for name in characters_name]
         return characters_lists
+
+    
+    def top_anime(self, top_type: str | None)-> List[Dict[str, str]]:
+        """
+        Fetches Top Anime List 
+
+        Returns:
+            Dict: Returns a Dictionary with anime name, img, url
+        """
+        url = 'https://myanimelist.net/topanime.php'
+
+        if top_type:
+            url = f"{self.BASE_URL}/topanime.php?type={top_type}"
+
+        html = self._fetch(url, "topanime.php")
+
+        return parse_top_anime(html)

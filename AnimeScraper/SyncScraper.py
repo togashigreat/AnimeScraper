@@ -7,7 +7,7 @@ for interacting with `Myanimelist <https://myanimelist.net/>`__ data, as well as
 
 __all__ = ["SyncKunYu"]
 
-from typing import Optional, List
+from typing import Dict, Optional, List
 import httpx
 from ._model import Anime, Character
 from .sync_malscraper import SyncMalScraper
@@ -169,3 +169,17 @@ class SyncKunYu:
             batch_characters = scraper.search_batch_character(character_names)
 
         return batch_characters
+
+    def top_anime_list(self, sort_by: str | None = None)-> List[Dict[str, str]]:
+        """
+        Fetches Top Anime List From MAL. returns top anime list by popularity, rates etc.
+
+        Args:
+            sort_by (str): Sort by 'bypopularity', 'favorite', 'tv', 'movie', 'airing', 'upcoming', 'ova' etc. 
+
+        Returns:
+            List[Dict[str, str]]: Returns a list/array of dictionary with anime name, img, url
+        """
+        with self.Scraper as scraper:
+            topAnime = scraper.top_anime(sort_by)
+        return topAnime

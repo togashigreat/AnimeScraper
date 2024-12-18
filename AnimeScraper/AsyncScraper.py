@@ -7,7 +7,7 @@ for interacting with `Myanimelist <https://myanimelist.net/>`__ data, as well as
 
 __all__ = ["KunYu"]
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 import aiohttp
 from ._model import Anime, Character
 from .async_malscraper import MalScraper
@@ -181,4 +181,19 @@ class KunYu:
         async with self.Scraper as scraper:
             batch_characters = await scraper.search_batch_character(character_names)
             return batch_characters
-        
+       
+
+    
+    async def top_anime_list(self, sort_by: str | None = None)-> List[Dict[str, str]]:
+        """
+        Fetches Top Anime List From MAL. 
+
+        Args:
+            sort_by (str): Sort by 'bypopularity', 'favorite', 'tv', 'movie', 'airing', 'upcoming', 'ova' etc. 
+
+        Returns:
+            List[Dict[str, str]]: Returns a list/array of dictionary with anime name, img, url
+        """
+        async with self.Scraper as scraper:
+            topAnime = await scraper.top_anime(sort_by)
+        return topAnime

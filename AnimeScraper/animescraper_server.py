@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Query
 from AnimeScraper import KunYu  # Import KunYu (main entry point)
 from AnimeScraper._model import Anime, Character  # Import response models
-from typing import Generator, List
+from typing import Dict, Generator, List
 import asyncio, os
 
 app = FastAPI(
@@ -135,4 +135,32 @@ async def search_batch_character(
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Error batch searching character: {str(e)}")
 
+
+@app.get("/topanime", response_model=List[Dict[str, str]])
+async def top_anime(kunyu_instance: KunYu = Depends(get_kunyu_instance)) -> List[Dict[str, str]]:
+    """
+    Endpoint to get top anime list by popularity, favorite, movie etc.
+    """
+    try:
+        topAnimeList = await kunyu_instance.top_anime_list()
+        if topAnimeList is None:
+            raise HTTPException(status_code=404, detail="Failed to get data")
+        return topAnimeList
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Error fetching anime list: {str(e)}")
+
+
+
+@app.get("/topanime/{sort_by}", response_model=List[Dict[str, str]])
+async def top_anime_sort(sort_by: str | None, kunyu_instance: KunYu = Depends(get_kunyu_instance)) -> List[Dict[str, str]]:
+    """
+    Endpoint to get top anime list by popularity, favorite, movie etc.
+    """
+    try:
+        topAnimeList = await kunyu_instance.top_anime_list(sort_by)
+        if topAnimeList is None:
+            raise HTTPException(status_code=404, detail="Failed to get data")
+        return topAnimeList
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Error fetching anime list: {str(e)}")
 

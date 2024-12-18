@@ -229,4 +229,21 @@ def normalize(text)-> str:
 def get_close_match(query, lists):
     return process.extractOne(normalize(query), lists, scorer=fuzz.ratio)
 
+def parse_top_anime(html: str)-> List[Dict[str, str]]:
 
+    start = '<table border="0" cellpadding="0" cellspacing="0" width="100%" class="top-ranking-table">'
+    end = '</table>'
+
+    table = html.split(start)[1].split(end)[0]
+    soup = BeautifulSoup(table, "html.parser")
+    tags = soup.find_all("td", "title al va-t word-break")
+    if not tags:
+        raise AttributeError("MAL html code structure has probably changed")
+    TopAnimeList = [
+        {
+            "id": get_id(tag.a.get("href")),
+            "name": tag.h3.string,
+            "img": tag.img.get("data-src")
+    } for tag in tags
+]
+    return TopAnimeList

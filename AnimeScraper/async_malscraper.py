@@ -1,5 +1,6 @@
-import aiohttp, asyncio
-from typing import Optional, List
+import aiohttp
+import asyncio
+from typing import Dict, Optional, List
 from urllib.parse import quote
 from aiolimiter import AsyncLimiter
 from aiohttp import ClientTimeout
@@ -17,6 +18,7 @@ from ._parse_anime_data import (
     parse_anime_search, 
     parse_character_search, 
     parse_the_character,
+    parse_top_anime,
     get_close_match,
     normalize
 )
@@ -105,7 +107,7 @@ class MalScraper:
             await self.db.close()
 
 
-    async def _fetch(self, url: str, req: int, query: str)-> str:
+    async def _fetch(self, url: str, query: str, req: int | None = None)-> str:
         """
         Fetch the HTML for a specific URL.
 
@@ -158,7 +160,7 @@ class MalScraper:
                 return Anime.from_json(cached_data)
 
         url = f"{self.BASE_URL}/anime/{anime_id}"
-        html = await self._fetch(url, self.CHARACTER, anime_id)
+        html = await self._fetch(url, anime_id,self.CHARACTER)
         anime =  _parse_anime_data(html)
 
         if self.use_cache:
@@ -187,7 +189,7 @@ class MalScraper:
                 return Character.from_json(cached_data)
 
         url = f"{self.BASE_URL}/character/{character_id}"
-        html = await self._fetch(url, self.CHARACTER, character_id)
+        html = await self._fetch(url, character_id, self.CHARACTER)
         character = parse_the_character(html)
 
         if self.use_cache:
@@ -206,7 +208,7 @@ class MalScraper:
             Anime: An Anime object with Anime Details.
         """
         url = f"{self.BASE_URL}/anime.php?q={quote(query)}&cat=anime"
-        html = await self._fetch(url, self.ANIME, query)
+        html = await self._fetch(url, query ,self.ANIME)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '<td class="borderClass bgColor1" valign="top" width="50">'
 
@@ -237,7 +239,7 @@ class MalScraper:
         """
 
         url = f"{self.BASE_URL}/character.php?q={query}&cat=character"
-        html = await self._fetch(url, self.CHARACTER, query)
+        html = await self._fetch(url, query ,self.CHARACTER)
         start = '<table border="0" cellpadding="0" cellspacing="0" width="100%">'
         end = '</table>'
         # getting all the Character row from table of search results
@@ -285,3 +287,23 @@ class MalScraper:
         tasks = [asyncio.create_task(self.search_character(name)) for name in character_names]
         characters = await asyncio.gather(*tasks)
         return [anime for anime in characters]
+
+    async def top_anime(self, top_type: str | None = None)-> List[Dict[str, str]]:
+        """
+        Fetches Top Anime List 
+
+        Returns:
+            Dict: Returns a Dictionary with anime name, img, url 
+        """
+
+        url = 'https://myanimelist.net/topanime.php'
+
+        if top_type:
+            url = f"{self.BASE_URL}/topanime.php?type={top_type}"
+
+        html = await self._fetch(url, "topanime.php")
+
+        return parse_top_anime(html)
+
+        
+
