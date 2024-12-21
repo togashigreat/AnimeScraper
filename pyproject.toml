@@ -7,7 +7,7 @@ readme = "README.md"
 repository = "https://github.com/togashigreat/AnimeScraper"
 homepage = "https://github.com/togashigreat/AnimeScraper"
 license = "GPL-V3.0"
-keywords = ["anime", "scraper", "myanimelist", "anime cli", "manga", "anime library", "api", "python anime", "fastapi"]
+keywords = ["anime", "anime scraper", "myanimelist", "anime cli", "manga", "anime library", "anime api", "python anime", "fastapi"]
 packages = [
     { include = "AnimeScraper" }
 ]
