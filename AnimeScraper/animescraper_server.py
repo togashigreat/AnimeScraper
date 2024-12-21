@@ -9,7 +9,7 @@ import os
 app = FastAPI(
     title="AnimeScraper API", 
     description="API for interacting with MyAnimeList data using AnimeScraper", 
-    version="1.1.7"
+    version="1.1.8"
 )
 app.add_middleware(
     CORSMiddleware,

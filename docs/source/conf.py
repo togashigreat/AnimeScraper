@@ -9,7 +9,7 @@
 project = 'AnimeScraper'
 copyright = '2024, Muhammad MuQiT'
 author = 'Muhammad MuQiT'
-release = "1.1.7"
+release = "1.1.8"
 version = release
 
 # -- General configuration ---------------------------------------------------
