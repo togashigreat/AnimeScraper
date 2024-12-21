@@ -44,9 +44,9 @@ class KunYu:
         """
 
 
-        self.shared_session: Optional[aiohttp.ClientSession] = None
-        self.Scraper = MalScraper(
-            session=self.shared_session,
+        self._shared_session: Optional[aiohttp.ClientSession] = None
+        self._Scraper = MalScraper(
+            session=self._shared_session,
             use_cache=use_cache,
             db_path=db_path,
             max_requests=max_requests,
@@ -60,7 +60,7 @@ class KunYu:
 
     async def __aenter__(self):
         # These Headers are needed in oder to get porper response from MAL
-        self.shared_session = aiohttp.ClientSession(
+        self._shared_session = aiohttp.ClientSession(
             headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -73,8 +73,8 @@ class KunYu:
 
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.shared_session:
-            await self.shared_session.close()
+        if self._shared_session:
+            await self._shared_session.close()
 
 
 
@@ -90,7 +90,7 @@ class KunYu:
             Anime: Returns Anime object with anime details.
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             anime = await scraper.search_anime(anime_name)
             return anime
 
@@ -108,7 +108,7 @@ class KunYu:
             Character: Returns Character object with the character details.
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             character = await scraper.search_character(character_name)
             return character
 
@@ -125,7 +125,7 @@ class KunYu:
             Anime: An object containing anime details.
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             anime = await scraper.get_anime(anime_id)
             return anime
 
@@ -143,10 +143,38 @@ class KunYu:
             Character: An object containing character details.
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             character = await scraper.get_character(character_id)
             return character
 
+    async def get_batch_anime(self, anime_ids: List[str])-> List[Anime]:
+        """
+        Fetches multiple anime from the list of anime id.
+
+        Args:
+            anime_ids (List[str]): A list of anime id. (anime ID from Myanimelist)
+
+        Returns:
+            List[Anime]: A list of Anime object containing anime details.
+        """
+        async with self._Scraper as scraper:
+            anime = await scraper.get_batch_anime(anime_ids)
+            return anime
+
+
+    async def get_batch_character(self, character_ids: List[str])-> List[Character]:
+        """
+        Fetches multiple character from the list of character id.
+
+        Args:
+            character_ids (List[str]): A list of character id. (character ID from Myanimelist)
+
+        Returns:
+            List[Character]: A list of Character object containing character details.
+        """
+        async with self._Scraper as scraper:
+            characters = await scraper.get_batch_character(character_ids)
+            return characters
 
     async def search_batch_anime(self, anime_names: List)-> List[Anime]:
         """
@@ -160,7 +188,7 @@ class KunYu:
 
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             batch_anime = await scraper.search_batch_anime(anime_names)
             return batch_anime 
 
@@ -178,7 +206,7 @@ class KunYu:
 
         """
 
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             batch_characters = await scraper.search_batch_character(character_names)
             return batch_characters
        
@@ -194,6 +222,6 @@ class KunYu:
         Returns:
             List[Dict[str, str]]: Returns a list/array of dictionary with anime name, img, url
         """
-        async with self.Scraper as scraper:
+        async with self._Scraper as scraper:
             topAnime = await scraper.top_anime(sort_by)
         return topAnime

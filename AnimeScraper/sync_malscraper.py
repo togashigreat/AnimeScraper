@@ -113,6 +113,13 @@ class SyncMalScraper():
         return anime
 
 
+    def get_batch_anime(self, anime_ids: List[str])-> List[Anime]:
+        """Fetches multiple anime from a list of anime id"""
+        with ThreadPoolExecutor(max_workers=4) as threat:
+            results = threat.map(self.get_anime, anime_ids)
+        return [anime for anime in results]
+
+
 
     def get_character(self, character_id: str)-> Character:
         """
@@ -137,6 +144,13 @@ class SyncMalScraper():
             _store_cache(self.db, "character", character_id, character.model_dump_json())
            
         return character
+
+
+    def get_batch_character(self, character_ids: List[str])-> List[Character]:
+        """Fetches multiple character from a list of character id"""
+        with ThreadPoolExecutor(max_workers=4) as threat:
+            results = threat.map(self.get_character, character_ids)
+        return [character for character in results]
 
 
 
@@ -194,7 +208,7 @@ class SyncMalScraper():
 
 
     def search_batch_anime(self, anime_names: List[str])-> List[Anime]:
-        with ThreadPoolExecutor(max_workers=5) as threat:
+        with ThreadPoolExecutor(max_workers=4) as threat:
             results = threat.map(self.search_anime, anime_names)
             return [result for result in results]
 

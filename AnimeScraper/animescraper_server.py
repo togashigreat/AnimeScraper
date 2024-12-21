@@ -9,7 +9,7 @@ import os
 app = FastAPI(
     title="AnimeScraper API", 
     description="API for interacting with MyAnimeList data using AnimeScraper", 
-    version="1.1.6"
+    version="1.1.7"
 )
 app.add_middleware(
     CORSMiddleware,
@@ -32,8 +32,8 @@ def get_kunyu_instance() -> Generator[KunYu, None, None]:
     kunyu_instance = KunYu(use_cache=USE_CACHE, db_path=DB_PATH, max_requests=3)  # Reusing session across requests
     yield kunyu_instance
     # Clean up and close the session once the app shuts down
-    if kunyu_instance.shared_session:
-        asyncio.run(kunyu_instance.shared_session.close())
+    if kunyu_instance._shared_session:
+        asyncio.run(kunyu_instance._shared_session.close())
         print("✅ KunYu instance closed successfully!")
 
 

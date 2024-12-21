@@ -170,6 +170,13 @@ class MalScraper:
 
 
 
+    async def get_batch_anime(self, anime_ids: List[str])-> List[Anime]:
+        tasks = [asyncio.create_task(self.get_anime(id)) for id in anime_ids]
+        results = await asyncio.gather(*tasks)
+        return [anime for anime in results]
+
+
+
     async def get_character(self, character_id: str)-> Character:
         """
         Fetch and parse character details.
@@ -195,6 +202,13 @@ class MalScraper:
         if self.use_cache:
             await _store_in_cache(self.db, "character", character_id, character.model_dump_json())
         return character
+
+
+    async def get_batch_character(self, character_ids: List[str])-> List[Character]:
+        tasks = [asyncio.create_task(self.get_character(id)) for id in character_ids]
+        results = await asyncio.gather(*tasks)
+
+        return [character for character in results]
 
 
     async def search_anime(self, query: str):
