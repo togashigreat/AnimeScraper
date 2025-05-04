@@ -107,6 +107,7 @@ from AnimeScraper import KunYu
 async def main():
     scraper = KunYu()
     # Search and Fetch Character detials by name
+    # chekc docs for all Available attributes 
     character = await scraper.search_character("Killua Zoldyck")
     print(character.name)
     print(character.url)
