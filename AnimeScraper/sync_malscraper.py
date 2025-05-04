@@ -1,3 +1,5 @@
+# SyncMalScraper is the Synchronous version of AnimeScraper
+
 import httpx
 from typing import Optional, List, Dict
 from urllib.parse import quote 
