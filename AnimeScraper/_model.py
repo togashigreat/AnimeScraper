@@ -1,5 +1,5 @@
 """
-Data models for AnimeScraper.
+Data models for AnimeScraper. All accecsible attributes are showed here.
 
 This module defines data structures for anime, characters, and related entities.
 """
