@@ -44,7 +44,7 @@ def cli():
 @click.command()
 @click.argument('anime_name')
 def search_anime(anime_name: str):
-    """Search for an anime by name."""
+    """Search for an Anime by name."""
     try:
         async def run():
             async with KunYu() as scraper:
