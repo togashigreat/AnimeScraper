@@ -30,8 +30,16 @@
 You can install AnimeScraper using pip:
 
 ```bash
-pip install animescraper
+pip install AnimeScraper
 ```
+
+To install fastapi local server:
+
+```bash
+pip install AnimeScraper[server]
+
+```
+
 
 ## Cli Tool
 You can use AnimeScraper in your command line too. Type `animescraper` for Usage. Available commands `search-anime`, `get-anime`, `search-character` etc. look at the Documentation for more information.

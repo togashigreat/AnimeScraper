@@ -4,5 +4,4 @@ aiosqlite
 aiohttp
 httpx
 beautifulsoup4
-rapidfuzz
 uvicorn

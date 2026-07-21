@@ -1,8 +1,8 @@
 import re
+import difflib
 from bs4 import BeautifulSoup
 from typing import Dict, List
 from ._model import Anime, AnimeCharacter, AnimeStats, Character
-from rapidfuzz import process, fuzz
 from .exceptions import CharacterNotFoundError
 
 def _parse_anime_data(html: str)-> Anime:
@@ -226,8 +226,31 @@ def normalize(text)-> str:
     return re.sub(r"[^a-zA-Z0-9\s]", "", text).lower()
 
 
-def get_close_match(query, lists):
-    return process.extractOne(normalize(query), lists, scorer=fuzz.ratio)
+def get_close_match(query, choices):
+    normalized_query = normalize(query)
+
+    best_index = -1
+    best_score = -1.0
+
+    for i, choice in enumerate(choices):
+        score = difflib.SequenceMatcher(
+            None,
+            normalized_query,
+            normalize(choice)
+        ).ratio()
+
+        if score > best_score:
+            best_score = score
+            best_index = i
+
+    if best_index == -1:
+        return None
+
+    return (
+        choices[best_index],   # original string
+        best_score * 100,      # match sxore
+        best_index             # index
+    )
 
 def parse_top_anime(html: str)-> List[Dict[str, str]]:
 
